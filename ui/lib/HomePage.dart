@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:ui/SurvivorReadPage.dart';
 
 import 'InputPage.dart';
 
@@ -23,48 +25,120 @@ class _HomePageState extends State<HomePage> {
     // TODO: Home Page UI Here
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('NFC ndef Read/Write')),
+        appBar: const CupertinoNavigationBar(
+          middle: Text(
+            "NFC ndef Read/Write",
+          ),
+        ),
         body: SafeArea(
           child: FutureBuilder<bool>(
             future: NfcManager.instance.isAvailable(),
-            builder: (context, ss) => ss.data != true
+            builder: (context, ss) => /*ss.data != true
                 ? Center(child: Text('NFC is available: ${ss.data}'))
-                : Flex(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    direction: Axis.vertical,
-                    children: [
-                      Flexible(
-                        flex: 2,
-                        child: Container(
-                          margin: const EdgeInsets.all(4),
-                          constraints: const BoxConstraints.expand(),
-                          decoration: BoxDecoration(border: Border.all()),
-                          child: SingleChildScrollView(
-                            child: ValueListenableBuilder<dynamic>(
-                              valueListenable: result,
-                              builder: (context, value, _) =>
-                                  Text('${value ?? ''}'),
+                :*/ Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          // TODO: Icon Here
+                        ),
+                        /*Flexible(
+                          flex: 2,
+                          child: Container(
+                            margin: const EdgeInsets.all(4),
+                            constraints: const BoxConstraints.expand(),
+                            decoration: BoxDecoration(border: Border.all()),
+                            child: SingleChildScrollView(
+                              child: ValueListenableBuilder<dynamic>(
+                                valueListenable: result,
+                                builder: (context, value, _) =>
+                                    Text('${value ?? ''}'),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 3,
-                        child: GridView.count(
-                          padding: const EdgeInsets.all(4),
-                          crossAxisCount: 2,
-                          childAspectRatio: 4,
-                          crossAxisSpacing: 4,
-                          mainAxisSpacing: 4,
+                        ),*/
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            ElevatedButton(
-                                child: Text('Read'), onPressed: _tagRead),
-                            ElevatedButton(
-                                child: Text('Write'),
-                                onPressed: _ndefWrite),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 10),
+                                    child: SizedBox(
+                                      height: 60,
+                                      child: OutlinedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          side: const BorderSide(
+                                            width: 2.0,
+                                            color: Colors.indigoAccent,
+                                          ),
+                                          backgroundColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        onPressed: _tagRead,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: const [
+                                            Icon(
+                                              Icons.nfc_rounded,
+                                              color: Colors.indigoAccent,
+                                            ),
+                                            Text(
+                                              'Read',
+                                              style: TextStyle(
+                                                color: Colors.indigoAccent,
+                                                fontSize: 18.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 20),
+                                    child: SizedBox(
+                                      height: 60,
+                                      child: FilledButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.indigoAccent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                        ),
+                                        onPressed: _ndefWrite,
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: const [
+                                            Icon(
+                                              Icons.edit
+                                            ),
+                                            Text(
+                                              'Write',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18.0,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
-                      ),
                     ],
                   ),
           ),
@@ -80,6 +154,10 @@ class _HomePageState extends State<HomePage> {
           .join('');
 
       // TODO: Access database with Unique ID => ndefUID
+      Navigator.push<String>(
+        context,
+        MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
+      );
 
       result.value = ndefUID;
 

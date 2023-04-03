@@ -1,5 +1,5 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nfc_manager/nfc_manager.dart';
 
 class InputPage extends StatefulWidget {
   @override
@@ -13,8 +13,11 @@ class _InputPageState extends State<InputPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Enter Message'),
+      appBar: const CupertinoNavigationBar(
+        leading: CupertinoNavigationBarBackButton(),
+        middle: Text(
+          "Write Survivor Info",
+        ),
       ),
       body: Column(
         children: [
@@ -45,6 +48,12 @@ class _InputPageState extends State<InputPage> {
                   ),
                   const SizedBox(height: 16.0),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigoAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
                     onPressed: () {
                       if (_formKey.currentState == null) {
                         Navigator.pop(context, _message);
