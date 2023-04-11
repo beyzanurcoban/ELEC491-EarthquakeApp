@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class SurvivorReadPage extends StatefulWidget {
   final String ndefUID;
@@ -32,11 +31,10 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   void initState() {
     super.initState();
     db = FirebaseFirestore.instance;
-    getUserFromDB();
-    //fetchData();
+    getVictimFromDB();
   }
 
-  Future<void> getUserFromDB() async {
+  Future<void> getVictimFromDB() async {
     final docRef = db.collection('victim').doc(widget.ndefUID);
     final docSnap = await docRef.get();
 
@@ -68,44 +66,279 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
           "Depremzede Bilgisi",
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 15, right: 15),
-        child: Column(
-          children: [
-            const Padding(padding: EdgeInsets.only(top: 30)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                const Padding(padding: EdgeInsets.only(top: 20)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      // TODO: Name Surname
-                      '$name $surname',
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 25.0,
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w700,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          // TODO: Name Surname
+                          '$name $surname',
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 25.0,
+                            color: Colors.black87,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Padding(padding: EdgeInsets.only(top: 5)),
+                        Text(
+                          "ndefUID: ${widget.ndefUID}",
+                          style: const TextStyle(
+                            fontSize: 15.0,
+                            color: Colors.black38,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Padding(padding: EdgeInsets.only(top: 15)),
+                      ],
+                    ),
+                  ],
+                ),
+                const Padding(padding: EdgeInsets.only(top: 10)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(padding: EdgeInsets.only(top: 10)),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Text(
+                        'TC Kimlik No.',
+                        textAlign: TextAlign.start,
                       ),
                     ),
-                    const Padding(padding: EdgeInsets.only(top: 5)),
-                    Text(
-                      "ndefUID: ${widget.ndefUID}",
-                      style: const TextStyle(
-                        fontSize: 15.0,
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
                         color: Colors.black38,
-                        fontWeight: FontWeight.w700,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Text(
+                          natID,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const Padding(padding: EdgeInsets.only(top: 5)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(padding: EdgeInsets.only(top: 10)),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Text(
+                        'Cinsiyet',
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: Colors.black38,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Text(
+                          sex,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const Padding(padding: EdgeInsets.only(top: 5)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(padding: EdgeInsets.only(top: 10)),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 5),
+                            child: Text(
+                              'Minimum Yaş',
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5.0),
+                              color: Colors.black38,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Text(
+                                ageMin,
+                                textAlign: TextAlign.start,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Padding(padding: EdgeInsets.only(left: 10)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(padding: EdgeInsets.only(top: 10)),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 5),
+                            child: Text(
+                              'Maksimum Yaş',
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5.0),
+                              color: Colors.black38,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: Text(
+                                ageMax,
+                                textAlign: TextAlign.start,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
+                const Padding(padding: EdgeInsets.only(top: 5)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(padding: EdgeInsets.only(top: 10)),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Text(
+                        'Kan Grubu',
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: Colors.black38,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Text(
+                          bloodType,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const Padding(padding: EdgeInsets.only(top: 5)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(padding: EdgeInsets.only(top: 10)),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Text(
+                        'Kronik Rahatsızlıklar',
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: Colors.black38,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Text(
+                          chronicIllness,
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const Padding(padding: EdgeInsets.only(top: 5)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(padding: EdgeInsets.only(top: 10)),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 5),
+                      child: Text(
+                        'Son Görülen Konum',
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: Colors.black38,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Text(
+                          '$latitude $longitude',
+                          textAlign: TextAlign.start,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
-            const Padding(padding: EdgeInsets.only(top: 10)),
-
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
