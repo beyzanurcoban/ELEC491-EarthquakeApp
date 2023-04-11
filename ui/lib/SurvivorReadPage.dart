@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class SurvivorReadPage extends StatefulWidget {
   final String ndefUID;
@@ -11,6 +14,43 @@ class SurvivorReadPage extends StatefulWidget {
 }
 
 class _SurvivorReadPageState extends State<SurvivorReadPage> {
+  String natID = 'Girilmemiş';
+  String name = 'Girilmemiş';
+  String surname = 'Girilmemiş';
+  String sex = 'Girilmemiş';
+  String ageMin = 'Girilmemiş';
+  String ageMax = 'Girilmemiş';
+  String bloodType = 'Girilmemiş';
+  String chronicIllness = 'Girilmemiş';
+  Float longitude = 0.0 as Float;
+  Float latitude = 0.0 as Float;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse(''));
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        natID = data['victim_nat_id'].toString();
+        name = data['victim_name'];
+        surname = data['victim_surname'];
+        sex = data['victim_sex'];
+        ageMin = data['victim_age_min'].toString();
+        ageMax = data['victim_age_max'].toString();
+        bloodType = data['blood_type'];
+        chronicIllness = data['chronic_illness'];
+        longitude = data['longitude'];
+        latitude = data['latitude'];
+      });
+    } else {
+      throw Exception('Failed to fetch victim data');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +58,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
       appBar: const CupertinoNavigationBar(
         leading: CupertinoNavigationBarBackButton(),
         middle: Text(
-          "Survivor Info",
+          "Depremzede Bilgisi",
         ),
       ),
       body: Padding(
@@ -32,10 +72,10 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text(
-                      // TODO: Pass name from database here
-                      "Alper Erdoğan",
-                      style: TextStyle(
+                    Text(
+                      // TODO: Name Surname
+                      '$name $surname',
+                      style: const TextStyle(
                         fontSize: 30.0,
                         color: Colors.black87,
                         fontWeight: FontWeight.w700,
@@ -55,6 +95,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
               ],
             ),
             const Padding(padding: EdgeInsets.only(top: 10)),
+
           ],
         ),
       ),
