@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "820587352291",
+    "project_id": "nfc-earthquake",
+    "storage_bucket": "nfc-earthquake.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820587352291:android:af58df5331c788368ef5d6",
+        "android_client_info": {
+          "package_name": "com.example.ui"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "820587352291-h3c9q9uondl46amoue2bgf8b1as9qc72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBh2kraLxrYMPEydeFXA34Jv_FWjpDyS5Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "820587352291-h3c9q9uondl46amoue2bgf8b1as9qc72.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
