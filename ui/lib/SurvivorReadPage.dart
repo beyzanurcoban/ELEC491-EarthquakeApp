@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -22,19 +23,25 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   String ageMax = 'Girilmemiş';
   String bloodType = 'Girilmemiş';
   String chronicIllness = 'Girilmemiş';
-  Float longitude = 0.0 as Float;
-  Float latitude = 0.0 as Float;
+  double longitude = 0.0;
+  double latitude = 0.0;
+
+  late FirebaseFirestore db;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    db = FirebaseFirestore.instance;
+    getUserFromDB();
+    //fetchData();
   }
 
-  Future<void> fetchData() async {
-    final response = await http.get(Uri.parse(''));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+  Future<void> getUserFromDB() async {
+    final docRef = db.collection('victim').doc(widget.ndefUID);
+    final docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
       setState(() {
         natID = data['victim_nat_id'].toString();
         name = data['victim_name'];
@@ -75,8 +82,9 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     Text(
                       // TODO: Name Surname
                       '$name $surname',
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 30.0,
+                        fontSize: 25.0,
                         color: Colors.black87,
                         fontWeight: FontWeight.w700,
                       ),
