@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:ui/SurvivorReadPage.dart';
+import 'package:ui/SurvivorWritePage.dart';
 
 import 'InputPage.dart';
 
@@ -13,7 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  ValueNotifier<dynamic> result = ValueNotifier(null);
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
       home: Scaffold(
         appBar: const CupertinoNavigationBar(
           middle: Text(
-            "NFC ndef Read/Write",
+            "ELEC491 NFC Takip",
           ),
         ),
         body: SafeArea(
@@ -42,21 +42,6 @@ class _HomePageState extends State<HomePage> {
                         Column(
                           // TODO: Icon Here
                         ),
-                        /*Flexible(
-                          flex: 2,
-                          child: Container(
-                            margin: const EdgeInsets.all(4),
-                            constraints: const BoxConstraints.expand(),
-                            decoration: BoxDecoration(border: Border.all()),
-                            child: SingleChildScrollView(
-                              child: ValueListenableBuilder<dynamic>(
-                                valueListenable: result,
-                                builder: (context, value, _) =>
-                                    Text('${value ?? ''}'),
-                              ),
-                            ),
-                          ),
-                        ),*/
                         Column(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -87,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                                               color: Colors.indigoAccent,
                                             ),
                                             Text(
-                                              'Read',
+                                              'NFC Etiket Oku',
                                               style: TextStyle(
                                                 color: Colors.indigoAccent,
                                                 fontSize: 18.0,
@@ -123,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                                               Icons.edit
                                             ),
                                             Text(
-                                              'Write',
+                                              'NFC Etikete Yaz',
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 18.0,
@@ -149,17 +134,16 @@ class _HomePageState extends State<HomePage> {
 
   void _tagRead() {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
+      // Get ndefUID from NFC tag
       var ndefUID = tag.data["ndef"]["identifier"]
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      // TODO: Access database with Unique ID => ndefUID
+      // Access database with Unique ID => ndefUID
       Navigator.push<String>(
         context,
         MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
       );
-
-      result.value = ndefUID;
 
       NfcManager.instance.stopSession();
     });
@@ -172,29 +156,13 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      var message = await Navigator.push<String>(
+      // Fetch from database with UID
+      Navigator.push<String>(
         context,
-        MaterialPageRoute(builder: (context) => InputPage()),
+        MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID,)),
       );
 
-      // Return with a canceled message if input is empty
-      if (message == null) {
-        result.value = 'Canceled';
-        NfcManager.instance.stopSession(errorMessage: result.value);
-        return;
-      }
-
-      // Write received message to database
-      try {
-        // TODO: Write message to database with UID (ndefUID)
-
-        result.value = 'Success to "Ndef Write"\nNdefUID: $ndefUID\nMessage: $message';
-        NfcManager.instance.stopSession();
-      } catch (e) {
-        result.value = e;
-        NfcManager.instance.stopSession(errorMessage: result.value.toString());
-        return;
-      }
+      NfcManager.instance.stopSession();
     });
   }
 }
