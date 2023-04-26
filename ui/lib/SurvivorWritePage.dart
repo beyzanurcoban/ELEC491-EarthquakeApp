@@ -47,82 +47,10 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
     getVictimFromDB();
   }
 
-  Future<void> getVictimFromDB() async {
-    final docRef = db.collection('victim').doc(widget.ndefUID);
-    final docSnap = await docRef.get();
-
-    if (docSnap.exists) {
-      final data = docSnap.data()!;
-      setState(() {
-        natID = data['victim_nat_id']?.toString() ?? natID;
-        name = data['victim_name'] ?? name;
-        surname = data['victim_surname'] ?? surname;
-        sex = data['victim_sex'] ?? sex;
-        ageMin = data['victim_age_min']?.toString() ?? ageMin;
-        ageMax = data['victim_age_max']?.toString() ?? ageMax;
-        bloodType = data['blood_type'] ?? bloodType;
-        chronicIllness = data['chronic_illness'] ?? chronicIllness;
-        latitude = data['latitude'] ?? latitude;
-        longitude = data['longitude'] ?? longitude;
-      });
-    } else {
-      throw Exception('Failed to fetch victim data');
-    }
-  }
-
-  Future<void> writeVictimToDB() async {
-    try {
-      final docRef = db.collection('victim').doc(widget.ndefUID);
-
-      Map<String, dynamic> victimData = {};
-      if (_natIDInputController.text.isNotEmpty) {
-        victimData['victim_nat_id'] = _natIDInputController.text;
-      }
-      if (_nameInputController.text.isNotEmpty) {
-        victimData['victim_name'] = _nameInputController.text;
-      }
-      if (_surnameInputController.text.isNotEmpty) {
-        victimData['victim_surname'] = _surnameInputController.text;
-      }
-      if (_sexInputController.text.isNotEmpty) {
-        victimData['victim_sex'] = _sexInputController.text;
-      }
-      if (_ageMinInputController.text.isNotEmpty) {
-        victimData['victim_age_min'] = int.tryParse(_ageMinInputController.text);
-      }
-      if (_ageMaxInputController.text.isNotEmpty) {
-        victimData['victim_age_max'] = int.tryParse(_ageMaxInputController.text);
-      }
-      if (_bloodTypeInputController.text.isNotEmpty) {
-        victimData['blood_type'] = _bloodTypeInputController.text;
-      }
-      if (_chronicIllnessInputController.text.isNotEmpty) {
-        victimData['chronic_illness'] = _chronicIllnessInputController.text;
-      }
-
-      // TODO: After implementing location services
-      /*victimData['latitude'] = latitude;
-      victimData['longitude'] = longitude;*/
-
-      final docSnap = await docRef.get();
-      if (docSnap.exists) {
-        await docRef.update(victimData);
-      } else {
-        await docRef.set(victimData);
-      }
-
-    } catch (e) {
-      throw Exception('Failed to update victim data');
-    }
-  }
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CupertinoNavigationBar(
-        leading: CupertinoNavigationBarBackButton(),
         middle: Text(
           "Depremzede Bilgi Kayıt",
         ),
@@ -371,5 +299,74 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
         ),
       )
     );
+  }
+
+  Future<void> getVictimFromDB() async {
+    final docRef = db.collection('victim').doc(widget.ndefUID);
+    final docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+      setState(() {
+        natID = data['victim_nat_id']?.toString() ?? natID;
+        name = data['victim_name'] ?? name;
+        surname = data['victim_surname'] ?? surname;
+        sex = data['victim_sex'] ?? sex;
+        ageMin = data['victim_age_min']?.toString() ?? ageMin;
+        ageMax = data['victim_age_max']?.toString() ?? ageMax;
+        bloodType = data['blood_type'] ?? bloodType;
+        chronicIllness = data['chronic_illness'] ?? chronicIllness;
+        latitude = data['latitude'] ?? latitude;
+        longitude = data['longitude'] ?? longitude;
+      });
+    } else {
+      throw Exception('Failed to fetch victim data');
+    }
+  }
+
+  Future<void> writeVictimToDB() async {
+    try {
+      final docRef = db.collection('victim').doc(widget.ndefUID);
+
+      Map<String, dynamic> victimData = {};
+      if (_natIDInputController.text.isNotEmpty) {
+        victimData['victim_nat_id'] = _natIDInputController.text;
+      }
+      if (_nameInputController.text.isNotEmpty) {
+        victimData['victim_name'] = _nameInputController.text;
+      }
+      if (_surnameInputController.text.isNotEmpty) {
+        victimData['victim_surname'] = _surnameInputController.text;
+      }
+      if (_sexInputController.text.isNotEmpty) {
+        victimData['victim_sex'] = _sexInputController.text;
+      }
+      if (_ageMinInputController.text.isNotEmpty) {
+        victimData['victim_age_min'] = int.tryParse(_ageMinInputController.text);
+      }
+      if (_ageMaxInputController.text.isNotEmpty) {
+        victimData['victim_age_max'] = int.tryParse(_ageMaxInputController.text);
+      }
+      if (_bloodTypeInputController.text.isNotEmpty) {
+        victimData['blood_type'] = _bloodTypeInputController.text;
+      }
+      if (_chronicIllnessInputController.text.isNotEmpty) {
+        victimData['chronic_illness'] = _chronicIllnessInputController.text;
+      }
+
+      // TODO: After implementing location services
+      /*victimData['latitude'] = latitude;
+      victimData['longitude'] = longitude;*/
+
+      final docSnap = await docRef.get();
+      if (docSnap.exists) {
+        await docRef.update(victimData);
+      } else {
+        await docRef.set(victimData);
+      }
+
+    } catch (e) {
+      throw Exception('Failed to update victim data');
+    }
   }
 }

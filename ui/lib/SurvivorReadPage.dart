@@ -38,34 +38,10 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
     getVictimFromDB();
   }
 
-  Future<void> getVictimFromDB() async {
-    final docRef = db.collection('victim').doc(widget.ndefUID);
-    final docSnap = await docRef.get();
-
-    if (docSnap.exists) {
-      final data = docSnap.data()!;
-      setState(() {
-        natID = data['victim_nat_id']?.toString() ?? natID;
-        name = data['victim_name'] ?? name;
-        surname = data['victim_surname'] ?? surname;
-        sex = data['victim_sex'] ?? sex;
-        ageMin = data['victim_age_min']?.toString() ?? ageMin;
-        ageMax = data['victim_age_max']?.toString() ?? ageMax;
-        bloodType = data['blood_type'] ?? bloodType;
-        chronicIllness = data['chronic_illness'] ?? chronicIllness;
-        latitude = data['latitude'] ?? latitude;
-        longitude = data['longitude'] ?? longitude;
-      });
-    } else {
-      throw Exception('Failed to fetch victim data');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CupertinoNavigationBar(
-        leading: CupertinoNavigationBarBackButton(),
         middle: Text(
           "Depremzede Bilgisi",
         ),
@@ -74,7 +50,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   const Padding(padding: EdgeInsets.only(top: 20)),
@@ -82,7 +58,6 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        // TODO: Name Surname
                         '$name $surname',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -343,5 +318,28 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
         ),
       ),
     );
+  }
+
+  Future<void> getVictimFromDB() async {
+    final docRef = db.collection('victim').doc(widget.ndefUID);
+    final docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+      setState(() {
+        natID = data['victim_nat_id']?.toString() ?? natID;
+        name = data['victim_name'] ?? name;
+        surname = data['victim_surname'] ?? surname;
+        sex = data['victim_sex'] ?? sex;
+        ageMin = data['victim_age_min']?.toString() ?? ageMin;
+        ageMax = data['victim_age_max']?.toString() ?? ageMax;
+        bloodType = data['blood_type'] ?? bloodType;
+        chronicIllness = data['chronic_illness'] ?? chronicIllness;
+        latitude = data['latitude'] ?? latitude;
+        longitude = data['longitude'] ?? longitude;
+      });
+    } else {
+      throw Exception('Failed to fetch victim data');
+    }
   }
 }
