@@ -20,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _nfcSessionRunning = false;
   bool _roleExists = false;
+  bool _canWriteVictim = false;
 
   final Map<String, String> _roles = {
     'clinic': 'Hastane',
@@ -67,8 +68,9 @@ class _HomePageState extends State<HomePage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Column(
-                          // TODO: Logo Here
+                        Padding(
+                          padding: const EdgeInsets.only(left: 80, right: 80, bottom: 16),
+                          child: Image.asset('assets/images/dost_logo.png'),
                         ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -127,41 +129,44 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
-                                    child: SizedBox(
-                                      height: 60,
-                                      child: FilledButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.indigoAccent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
+                            Visibility(
+                              visible: _canWriteVictim,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
+                                      child: SizedBox(
+                                        height: 60,
+                                        child: FilledButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.indigoAccent,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
                                           ),
-                                        ),
-                                        onPressed: _ndefWrite,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: const [
-                                            Icon(
-                                              Icons.edit
-                                            ),
-                                            Text(
-                                              'NFC Etikete Yaz',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18.0,
+                                          onPressed: _ndefWrite,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: const [
+                                              Icon(
+                                                Icons.edit
                                               ),
-                                            ),
-                                          ],
+                                              Text(
+                                                'NFC Etikete Yaz',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 18.0,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             Visibility(
                               visible: _roleExists,
@@ -212,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(top: 60),
+                              padding: const EdgeInsets.only(top: 16),
                               child: TextButton(
                                   onPressed: () async {
                                     Navigator.pushReplacement(
@@ -355,6 +360,8 @@ class _HomePageState extends State<HomePage> {
     if (docSnap.exists) {
       final data = docSnap.data()!;
       setState(() {
+        _canWriteVictim = data['victim'] ?? false;
+
         _roleExists = data['ambulance'] ?? false;
         if (_roleExists) {
           _userRole = 'ambulance';
@@ -384,6 +391,7 @@ class _HomePageState extends State<HomePage> {
           _userRole = 'rescue';
           return;
         }
+
       });
     } else {
       throw Exception('Failed to fetch user data');

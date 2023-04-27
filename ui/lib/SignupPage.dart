@@ -71,6 +71,10 @@ class _SignupPageState extends State<SignupPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 80, right: 80, bottom: 16),
+                              child: Image.asset('assets/images/dost_logo.png'),
+                            ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -89,7 +93,7 @@ class _SignupPageState extends State<SignupPage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(bottom: 20),
+                                  padding: const EdgeInsets.only(bottom: 10),
                                   child: TextFormField(
                                     controller: _passwordInputController,
                                     obscureText: _passwordObscured,
@@ -127,19 +131,26 @@ class _SignupPageState extends State<SignupPage> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 40),
-                                  child: DropdownButton<String>(
-                                    value: _selectedRole,
-                                    items: _roles.entries
-                                        .map((entry) => DropdownMenuItem<String>(
-                                      value: entry.key,
-                                      child: Text(entry.value),
-                                    )).toList(),
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedRole = value!;
-                                      });
-                                    },
-                                    hint: const Text('Ekip Seçin'),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        'Ekip Seçin:'
+                                      ),
+                                      DropdownButton<String>(
+                                        value: _selectedRole,
+                                        items: _roles.entries
+                                            .map((entry) => DropdownMenuItem<String>(
+                                          value: entry.key,
+                                          child: Text(entry.value),
+                                        )).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _selectedRole = value!;
+                                          });
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 Padding(

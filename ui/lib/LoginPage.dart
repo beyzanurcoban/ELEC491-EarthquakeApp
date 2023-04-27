@@ -59,8 +59,9 @@ class _LoginPageState extends State<LoginPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(
-                              // TODO: Logo Here
+                            Padding(
+                              padding: const EdgeInsets.only(left: 80, right: 80, bottom: 16),
+                              child: Image.asset('assets/images/dost_logo.png'),
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -134,31 +135,57 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Text(
-                                      'Profilin yok mu?',
-                                      style: TextStyle(
-                                        color: Colors.black38,
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        // Go to Sign-up Page
-                                        Navigator.push<String>(
-                                          context,
-                                          MaterialPageRoute(builder: (context) => const SignupPage()),
-                                        );
-                                      },
-                                      child: const Text(
-                                        'Kayıt ol.',
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text(
+                                        'Profilin yok mu?',
                                         style: TextStyle(
-                                            color: Colors.blueAccent
+                                          color: Colors.black38,
                                         ),
                                       ),
-                                    )
-                                  ],
+                                      TextButton(
+                                        onPressed: () {
+                                          // Go to Sign-up Page
+                                          Navigator.push<String>(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => const SignupPage()),
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Kayıt ol.',
+                                          style: TextStyle(
+                                              color: Colors.blueAccent
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          // Go to Sign-up Page
+                                          Navigator.push<String>(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => const HomePage(username: 'readonly',)),
+                                          );
+                                        },
+                                        child: const Text(
+                                          'Giriş yapmadan devam et.',
+                                          style: TextStyle(
+                                              color: Colors.blueAccent
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
