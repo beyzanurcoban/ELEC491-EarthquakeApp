@@ -2,10 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:ui/RoleBasedRecordWritePage.dart';
+import 'package:ui/SearchPage.dart';
 import 'package:ui/SurvivorReadPage.dart';
 import 'package:ui/SurvivorWritePage.dart';
-
 import 'LoginPage.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,6 +36,8 @@ class _HomePageState extends State<HomePage> {
 
   late String _userRole = 'none';
 
+  final _storage = FlutterSecureStorage();
+
   late FirebaseFirestore db;
 
   @override
@@ -51,11 +55,23 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: Home Page UI Here
     return Scaffold(
-        appBar: const CupertinoNavigationBar(
-          middle: Text(
+        appBar: CupertinoNavigationBar(
+          middle: const Text(
             "ELEC491 NFC Takip",
           ),
           automaticallyImplyLeading: false,
+          trailing: IconButton(
+            onPressed: () {
+              Navigator.push<String>(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchPage()),
+              );
+            },
+            icon: const Icon(
+              Icons.search,
+              color: Colors.blue,
+            ),
+          ),
         ),
         body: SafeArea(
           child: FutureBuilder<bool>(
@@ -64,99 +80,62 @@ class _HomePageState extends State<HomePage> {
                 ? Center(child: Text('NFC is available: ${ss.data}'))
                 :*/ Stack(
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 80, right: 80, bottom: 16),
-                          child: Image.asset('assets/images/dost_logo.png'),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Text(
-                                'Kullanıcı: ${widget.username}\nYetki: ${_roles[_userRole]}',
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 15.0,
-                                  color: Colors.black38,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
-                                    child: SizedBox(
-                                      height: 60,
-                                      child: OutlinedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          side: const BorderSide(
-                                            width: 2.0,
-                                            color: Colors.blueAccent,
-                                          ),
-                                          backgroundColor: Colors.transparent,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        onPressed: _tagRead,
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: const [
-                                            Icon(
-                                              Icons.nfc_rounded,
-                                              color: Colors.blueAccent,
-                                            ),
-                                            Text(
-                                              'NFC Etiket Oku',
-                                              style: TextStyle(
-                                                color: Colors.blueAccent,
-                                                fontSize: 18.0,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                    SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 30, left: 80, right: 80, bottom: 16),
+                            child: Image.asset('assets/images/dost_logo.png'),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Text(
+                                  'Kullanıcı: ${widget.username}\nYetki: ${_roles[_userRole]}',
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 15.0,
+                                    color: Colors.black38,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                              ],
-                            ),
-                            Visibility(
-                              visible: _canWriteVictim,
-                              child: Row(
+                              ),
+                              Row(
                                 children: [
                                   Expanded(
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
                                       child: SizedBox(
                                         height: 60,
-                                        child: FilledButton(
+                                        child: OutlinedButton(
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.indigoAccent,
+                                            side: const BorderSide(
+                                              width: 2.0,
+                                              color: Colors.blueAccent,
+                                            ),
+                                            backgroundColor: Colors.transparent,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                           ),
-                                          onPressed: _ndefWrite,
+                                          onPressed: _tagRead,
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: const [
                                               Icon(
-                                                Icons.edit
+                                                Icons.nfc_rounded,
+                                                color: Colors.blueAccent,
                                               ),
                                               Text(
-                                                'NFC Etikete Yaz',
+                                                'NFC Etiket Oku',
                                                 style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 18.0,
+                                                  color: Colors.blueAccent,
+                                                  fontSize: 18.0,
                                                 ),
                                               ),
                                             ],
@@ -167,70 +146,110 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ],
                               ),
-                            ),
-                            Visibility(
-                              visible: _roleExists,
-                              child: Column(
-                                children: [
-                                  const Divider(
-                                    indent: 25,
-                                    endIndent: 25,
-                                    thickness: 2,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-                                          child: SizedBox(
-                                            height: 60,
-                                            child: FilledButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.deepOrange,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(10),
-                                                ),
+                              Visibility(
+                                visible: _canWriteVictim,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
+                                        child: SizedBox(
+                                          height: 60,
+                                          child: FilledButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.indigoAccent,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10),
                                               ),
-                                              onPressed: _ndefRoleBasedRecordWrite,
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-                                                  const Icon(
-                                                      Icons.add_rounded
-                                                  ),
-                                                  Text(
-                                                    '${_roles[_userRole]} Kaydı Ekle',
-                                                    style: const TextStyle(
+                                            ),
+                                            onPressed: _ndefWrite,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: const [
+                                                Icon(
+                                                  Icons.edit
+                                                ),
+                                                Text(
+                                                  'NFC Etikete Yaz',
+                                                  style: TextStyle(
                                                       color: Colors.white,
                                                       fontSize: 18.0,
-                                                    ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16),
-                              child: TextButton(
-                                  onPressed: () async {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const LoginPage()),
-                                    );
-                                  },
-                                  child: const Text('Çıkış Yap')
+                              Visibility(
+                                visible: _roleExists,
+                                child: Column(
+                                  children: [
+                                    const Divider(
+                                      indent: 25,
+                                      endIndent: 25,
+                                      thickness: 2,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+                                            child: SizedBox(
+                                              height: 60,
+                                              child: FilledButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.deepOrange,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                ),
+                                                onPressed: _ndefRoleBasedRecordWrite,
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    const Icon(
+                                                        Icons.add_rounded
+                                                    ),
+                                                    Text(
+                                                      '${_roles[_userRole]} Kaydı Ekle',
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 18.0,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16),
+                                child: TextButton(
+                                    onPressed: () async {
+                                      _deleteCredentials();
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => const LoginPage()),
+                                      );
+                                    },
+                                    child: const Text('Çıkış Yap')
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -396,5 +415,10 @@ class _HomePageState extends State<HomePage> {
     } else {
       throw Exception('Failed to fetch user data');
     }
+  }
+
+  Future<void> _deleteCredentials() async {
+    await _storage.delete(key: 'username');
+    await _storage.delete(key: 'password');
   }
 }

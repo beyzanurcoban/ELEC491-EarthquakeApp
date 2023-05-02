@@ -37,7 +37,7 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
     'firstaid': ['victim_cond', 'applied_date', 'notes'],
     'morgue': ['stat', 'enter_date', 'discharge_date', 'notes'],
     'rescue': ['rescue_date', 'longitude', 'latitude', 'province',
-                'city', 'district', 'street', 'building'],
+                'city', 'neighbourhood', 'street', 'building'],
   };
 
   bool stat = false;
@@ -62,7 +62,7 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   final TextEditingController _notesInputController = TextEditingController();
   final TextEditingController _provinceInputController = TextEditingController();
   final TextEditingController _cityInputController = TextEditingController();
-  final TextEditingController _districtInputController = TextEditingController();
+  final TextEditingController _neighbourhoodInputController = TextEditingController();
   final TextEditingController _streetInputController = TextEditingController();
   final TextEditingController _buildingInputController = TextEditingController();
 

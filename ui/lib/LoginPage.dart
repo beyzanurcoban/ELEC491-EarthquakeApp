@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:ui/HomePage.dart';
 import 'package:ui/SignupPage.dart';
 
@@ -24,6 +26,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _usernameInputController = TextEditingController();
   final TextEditingController _passwordInputController = TextEditingController();
 
+  final _storage = const FlutterSecureStorage();
+
   late FirebaseFirestore db;
 
   @override
@@ -33,6 +37,19 @@ class _LoginPageState extends State<LoginPage> {
     // Connect to DB
     db = FirebaseFirestore.instance;
 
+    // Retrieve stored credentials from DB
+    _storage.readAll().then((credentials) {
+      final username = credentials['username'];
+      final password = credentials['password'];
+
+      if (username != null && password != null) {
+        // Auto-login the user
+        setState(() {
+          _isLoading = true;
+        });
+        _autoLoginUser(username, password);
+      }
+    });
   }
 
   @override
@@ -108,12 +125,16 @@ class _LoginPageState extends State<LoginPage> {
                                   padding: const EdgeInsets.only(bottom: 20),
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      if (await usernamePasswordExists()) {
-                                        // TODO: Store login credentials (for auto-login)
+                                      String usernameInput = _usernameInputController.text;
+                                      String passwordInput = _passwordInputController.text;
+                                      if (await usernamePasswordExists(usernameInput, passwordInput)) {
+                                        // Store login credentials (for auto-login)
+                                        await _storeCredentials(usernameInput, passwordInput);
+
                                         // Go to Home Page (with username)
                                         Navigator.pushReplacement(
                                           context,
-                                          MaterialPageRoute(builder: (context) => HomePage(username: _usernameInputController.text,)),
+                                          MaterialPageRoute(builder: (context) => HomePage(username: usernameInput,)),
                                         );
                                       } else {
                                         setState(() {
@@ -235,19 +256,19 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Future<bool> usernamePasswordExists() async {
+  Future<bool> usernamePasswordExists(String username, String password) async {
     setState(() {
       _isLoading = true;
     });
 
-    final docRef = db.collection('user').doc(_usernameInputController.text);
+    final docRef = db.collection('user').doc(username);
     final docSnap = await docRef.get();
 
     if (docSnap.exists) {
       final data = docSnap.data()!;
 
       String passwordInputHashed = sha256.convert(
-          utf8.encode(_passwordInputController.text)
+          utf8.encode(password)
       ).toString();
 
       if (passwordInputHashed == data['pass']) {
@@ -256,5 +277,19 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     return false;
+  }
+
+  Future<void> _storeCredentials(String username, String password) async {
+    await _storage.write(key: 'username', value: username);
+    await _storage.write(key: 'password', value: password);
+  }
+
+  Future<void> _autoLoginUser(String username, String password) async {
+    if (await usernamePasswordExists(username, password)) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage(username: username,)),
+      );
+    }
   }
 }

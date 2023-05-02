@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:ui/HomePage.dart';
 
 class SignupPage extends StatefulWidget {
@@ -35,6 +37,8 @@ class _SignupPageState extends State<SignupPage> {
   };
 
   String _selectedRole = 'clinic';
+
+  final _storage = const FlutterSecureStorage();
 
   late FirebaseFirestore db;
 
@@ -157,12 +161,15 @@ class _SignupPageState extends State<SignupPage> {
                                   padding: const EdgeInsets.only(bottom: 20),
                                   child: ElevatedButton(
                                     onPressed: () async {
+                                      String usernameInput = _usernameInputController.text;
+                                      String passwordInput = _passwordInputController.text;
                                       if (await userCreated()) {
                                         // TODO: Store login credentials (for auto-login)
+                                        _storeCredentials(usernameInput, passwordInput);
                                         // Go to Home Page (with username)
                                         Navigator.pushReplacement(
                                           context,
-                                          MaterialPageRoute(builder: (context) => HomePage(username: _usernameInputController.text,)),
+                                          MaterialPageRoute(builder: (context) => HomePage(username: usernameInput,)),
                                         );
                                       } else {
                                         setState(() {
@@ -267,5 +274,10 @@ class _SignupPageState extends State<SignupPage> {
       errorMessage = 'Veritabanı Hatası: ${e.toString()}';
       return false;
     }
+  }
+
+  Future<void> _storeCredentials(String username, String password) async {
+    await _storage.write(key: 'username', value: username);
+    await _storage.write(key: 'password', value: password);
   }
 }
