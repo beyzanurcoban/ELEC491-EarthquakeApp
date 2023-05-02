@@ -220,12 +220,12 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                           );
                           if (selectedDate != null) {
                             setState(() {
-                              _isDischargeDateSelected = true;
-                              dischargeDate = selectedDate;
+                              _isAppliedDateSelected = true;
+                              appliedDate = selectedDate;
                             });
                           }
                         },
-                        child: Text(_isDischargeDateSelected ? dischargeDate.toString() : 'İlk Yardım Uygulama Tarihi Seç'),
+                        child: Text(_isAppliedDateSelected ? appliedDate.toString() : 'İlk Yardım Uygulama Tarihi Seç'),
                       ),
                     ],
                   ),
@@ -257,12 +257,12 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                           );
                           if (selectedDate != null) {
                             setState(() {
-                              _isDischargeDateSelected = true;
-                              dischargeDate = selectedDate;
+                              _isRescueDateSelected = true;
+                              rescueDate = selectedDate;
                             });
                           }
                         },
-                        child: Text(_isDischargeDateSelected ? dischargeDate.toString() : 'Depremzede Kurtarma Tarihi Seç'),
+                        child: Text(_isRescueDateSelected ? rescueDate.toString() : 'Depremzede Kurtarma Tarihi Seç'),
                       ),
                     ],
                   ),
