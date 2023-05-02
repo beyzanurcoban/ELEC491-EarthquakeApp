@@ -517,17 +517,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
       final docRef = db.collection(widget.role).doc(widget.ndefUID);
 
       Map<String, dynamic> record = {};
+
+      if (_isEnterDateSelected) {
+        record['enter_datetime'] = Timestamp.fromDate(enterDate);
+        record['stay_status'] = true;
+      }
+
       if (_isDischargeDateSelected) {
         // Write discharge record, set stay_status to 0
         record['stay_status'] = false;
         record['discharge_datetime'] = Timestamp.fromDate(dischargeDate);
-      } else {
-        record['stay_status'] = true;
       }
 
-      if (_isEnterDateSelected) {
-        record['enter_datetime'] = Timestamp.fromDate(enterDate);
-      }
+
 
       if (_isAppliedDateSelected) {
         record['applied_datetime'] = Timestamp.fromDate(appliedDate);

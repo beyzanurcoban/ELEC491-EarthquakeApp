@@ -393,6 +393,12 @@ class _HomePageState extends State<HomePage> {
           return;
         }
 
+        _roleExists = data['firstaid'] ?? false;
+        if (_roleExists) {
+          _userRole = 'firstaid';
+          return;
+        }
+
         _roleExists = data['er'] ?? false;
         if (_roleExists) {
           _userRole = 'er';
