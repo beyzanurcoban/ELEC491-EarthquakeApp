@@ -59,7 +59,7 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   bool _isAppliedDateSelected = false;
   bool _isRescueDateSelected = false;
 
-  int victimCondition = 0;
+  int victimCondition = -1;
   double longitude = 0.0;
   double latitude = 0.0;
   DateTime enterDate = DateTime.now();
@@ -530,11 +530,15 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
       }
 
       if (_isAppliedDateSelected) {
-        record['applied_datetime'] = Timestamp.fromDate(enterDate);
+        record['applied_datetime'] = Timestamp.fromDate(appliedDate);
       }
 
       if (_isRescueDateSelected) {
-        record['rescue_datetime'] = Timestamp.fromDate(enterDate);
+        record['rescue_datetime'] = Timestamp.fromDate(rescueDate);
+      }
+
+      if (victimCondition != -1) {
+        record['victim_condition'] = victimCondition;
       }
 
       if (_cityInputController.text.isNotEmpty) {
