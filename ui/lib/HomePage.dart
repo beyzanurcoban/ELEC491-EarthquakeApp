@@ -5,6 +5,7 @@ import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:ui/RoleBasedRecordWritePage.dart';
+import 'package:ui/SearchPage.dart';
 import 'package:ui/SurvivorReadPage.dart';
 import 'package:ui/SurvivorWritePage.dart';
 import 'LoginPage.dart';
@@ -54,11 +55,23 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: Home Page UI Here
     return Scaffold(
-        appBar: const CupertinoNavigationBar(
-          middle: Text(
+        appBar: CupertinoNavigationBar(
+          middle: const Text(
             "ELEC491 NFC Takip",
           ),
           automaticallyImplyLeading: false,
+          trailing: IconButton(
+            onPressed: () {
+              Navigator.push<String>(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchPage()),
+              );
+            },
+            icon: const Icon(
+              Icons.search,
+              color: Colors.blue,
+            ),
+          ),
         ),
         body: SafeArea(
           child: FutureBuilder<bool>(
