@@ -60,15 +60,15 @@ class _HomePageState extends State<HomePage> {
             "ELEC491 NFC Takip",
           ),
           automaticallyImplyLeading: false,
-          trailing: IconButton(
+          trailing: CupertinoButton(
             onPressed: () {
               Navigator.push<String>(
                 context,
                 MaterialPageRoute(builder: (context) => const SearchPage()),
               );
             },
-            icon: const Icon(
-              Icons.search,
+            child: const Icon(
+              CupertinoIcons.search,
               color: Colors.blue,
             ),
           ),
