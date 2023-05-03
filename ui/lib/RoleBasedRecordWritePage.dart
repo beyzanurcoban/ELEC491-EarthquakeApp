@@ -28,16 +28,18 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma',
     'ambulance': 'Ambulans',
+    'graveyard': 'Mezarlık ve Defin',
     'none': 'Yok'
   };
 
   final Map<String, List<String>> _dbFields = {
-    'clinic': ['stay_status', 'enter_datetime', 'discharge_datetime', 'notes'],
-    'er': ['stay_status', 'enter_datetime', 'discharge_datetime', 'notes'],
-    'firstaid': ['victim_condition', 'applied_date', 'notes'],
-    'morgue': ['stay_status', 'enter_datetime', 'discharge_datetime', 'notes'],
+    'clinic': ['stay_status', 'hospital_name', 'enter_datetime', 'discharge_datetime', 'notes'],
+    'er': ['stay_status', 'hospital_name', 'enter_datetime', 'discharge_datetime', 'notes'],
+    'firstaid': ['hospital_name', 'victim_condition', 'applied_date', 'notes'],
+    'morgue': ['stay_status', 'hospital_name', 'enter_datetime', 'discharge_datetime', 'notes'],
     'rescue': ['rescue_datetime', 'longitude', 'latitude', 'city',
                 'province', 'neighbourhood', 'street', 'building'],
+    'graveyard': ['graveyard_name', 'burial_datetime'],
   };
 
   final Map<int, String> _victimConditions = {
@@ -58,6 +60,7 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   bool _isDischargeDateSelected = false;
   bool _isAppliedDateSelected = false;
   bool _isRescueDateSelected = false;
+  bool _isBurialDateSelected = false;
 
   int victimCondition = -1;
   double longitude = 0.0;
@@ -66,12 +69,15 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   DateTime dischargeDate = DateTime.now();
   DateTime appliedDate = DateTime.now();
   DateTime rescueDate = DateTime.now();
+  DateTime burialDate = DateTime.now();
   String notes = 'Girilmemiş';
   String city = 'Girilmemiş';
   String province = 'Girilmemiş';
   String neighbourhood = 'Girilmemiş';
   String street = 'Girilmemiş';
   String building = 'Girilmemiş';
+  String hospitalName = 'Girilmemiş';
+  String graveyardName = 'Girilmemiş';
 
   final TextEditingController _notesInputController = TextEditingController();
   final TextEditingController _cityInputController = TextEditingController();
@@ -79,6 +85,8 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   final TextEditingController _neighbourhoodInputController = TextEditingController();
   final TextEditingController _streetInputController = TextEditingController();
   final TextEditingController _buildingInputController = TextEditingController();
+  final TextEditingController _hospitalNameInputController = TextEditingController();
+  final TextEditingController _graveyardNameInputController = TextEditingController();
 
   late FirebaseFirestore db;
 
@@ -121,6 +129,42 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                 ),
               ),
               Visibility(
+                visible: _dbFields[widget.role]?.contains('hospital_name') ?? false,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        controller: _hospitalNameInputController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Hastane Adı',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: _dbFields[widget.role]?.contains('graveyard_name') ?? false,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        controller: _graveyardNameInputController,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Mezarlık Adı',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Visibility(
                 visible: _dbFields[widget.role]?.contains('enter_datetime') ?? false,
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 20.0),
@@ -151,7 +195,7 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                             });
                           }
                         },
-                        child: Text(_isEnterDateSelected ? enterDate.toString() : 'Giriş Tarihi Seç'),
+                        child: Text(_isEnterDateSelected ? enterDate.toString() : DateTime.now().toString()),
                       ),
                     ],
                   ),
@@ -225,7 +269,7 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                             });
                           }
                         },
-                        child: Text(_isAppliedDateSelected ? appliedDate.toString() : 'İlk Yardım Uygulama Tarihi Seç'),
+                        child: Text(_isAppliedDateSelected ? appliedDate.toString() : DateTime.now().toString()),
                       ),
                     ],
                   ),
@@ -262,7 +306,44 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                             });
                           }
                         },
-                        child: Text(_isRescueDateSelected ? rescueDate.toString() : 'Depremzede Kurtarma Tarihi Seç'),
+                        child: Text(_isRescueDateSelected ? rescueDate.toString() : DateTime.now().toString()),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: _dbFields[widget.role]?.contains('burial_datetime') ?? false,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Defnedilme Tarihi',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      ElevatedButton(
+                        onPressed: () async {
+                          final DateTime? selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (selectedDate != null) {
+                            setState(() {
+                              _isBurialDateSelected = true;
+                              burialDate = selectedDate;
+                            });
+                          }
+                        },
+                        child: Text(_isBurialDateSelected ? burialDate.toString() : DateTime.now().toString()),
                       ),
                     ],
                   ),
@@ -477,6 +558,11 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
           _isRescueDateSelected = true;
         }
 
+        if (data.containsKey('burial_datetime') && data['burial_datetime'] != null) {
+          burialDate = DateTime.fromMillisecondsSinceEpoch(data['burial_datetime'] * 1000);
+          _isBurialDateSelected = true;
+        }
+
         city = data.containsKey('city') && data['city'] != null
             ? data['city'].toString()
             : city;
@@ -501,6 +587,16 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
             ? data['building'].toString()
             : building;
         _buildingInputController.text = building;
+
+         hospitalName = data.containsKey('hospital_name') && data['hospital_name'] != null
+            ? data['hospital_name'].toString()
+            : hospitalName;
+        _hospitalNameInputController.text = hospitalName;
+
+        graveyardName = data.containsKey('graveyard_name') && data['graveyard_name'] != null
+            ? data['graveyard_name'].toString()
+            : graveyardName;
+        _graveyardNameInputController.text = graveyardName;
 
         notes = data.containsKey('notes') && data['notes'] != null
             ? data['notes'].toString()
@@ -537,6 +633,10 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
         record['rescue_datetime'] = Timestamp.fromDate(rescueDate);
       }
 
+      if (_isBurialDateSelected) {
+        record['burial_datetime'] = Timestamp.fromDate(burialDate);
+      }
+
       if (victimCondition != -1) {
         record['victim_condition'] = victimCondition;
       }
@@ -559,6 +659,14 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
 
       if (_buildingInputController.text.isNotEmpty) {
         record['building'] = _buildingInputController.text;
+      }
+
+      if (_hospitalNameInputController.text.isNotEmpty) {
+        record['hospital_name'] = _hospitalNameInputController.text;
+      }
+
+      if (_graveyardNameInputController.text.isNotEmpty) {
+        record['graveyard_name'] = _graveyardNameInputController.text;
       }
 
       if (_notesInputController.text.isNotEmpty) {
