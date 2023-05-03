@@ -24,6 +24,8 @@ class _HomePageState extends State<HomePage> {
   bool _roleExists = false;
   bool _canWriteVictim = false;
 
+  Color _primaryColor = const Color(0xff6a6b83);
+
   final Map<String, String> _roles = {
     'clinic': 'Hastane',
     'er': 'Acil',
@@ -112,13 +114,9 @@ class _HomePageState extends State<HomePage> {
                                       padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
                                       child: SizedBox(
                                         height: 60,
-                                        child: OutlinedButton(
+                                        child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
-                                            side: const BorderSide(
-                                              width: 2.0,
-                                              color: Colors.blueAccent,
-                                            ),
-                                            backgroundColor: Colors.transparent,
+                                            backgroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(10),
                                             ),
@@ -126,15 +124,15 @@ class _HomePageState extends State<HomePage> {
                                           onPressed: _tagRead,
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: const [
+                                            children: [
                                               Icon(
                                                 Icons.nfc_rounded,
-                                                color: Colors.blueAccent,
+                                                color: _primaryColor,
                                               ),
                                               Text(
                                                 'NFC Etiket Oku',
                                                 style: TextStyle(
-                                                  color: Colors.blueAccent,
+                                                  color: _primaryColor,
                                                   fontSize: 18.0,
                                                 ),
                                               ),
@@ -155,9 +153,9 @@ class _HomePageState extends State<HomePage> {
                                         padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
                                         child: SizedBox(
                                           height: 60,
-                                          child: FilledButton(
+                                          child: ElevatedButton(
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.indigoAccent,
+                                              backgroundColor: _primaryColor,
                                               shape: RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.circular(10),
                                               ),
@@ -201,9 +199,9 @@ class _HomePageState extends State<HomePage> {
                                             padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
                                             child: SizedBox(
                                               height: 60,
-                                              child: FilledButton(
+                                              child: ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.deepOrange,
+                                                  backgroundColor: Colors.white,
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius: BorderRadius.circular(10),
                                                   ),
@@ -213,12 +211,13 @@ class _HomePageState extends State<HomePage> {
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     const Icon(
-                                                        Icons.add_rounded
+                                                      Icons.add_rounded,
+                                                      color: Colors.deepOrange,
                                                     ),
                                                     Text(
                                                       '${_roles[_userRole]} Kaydı Ekle',
                                                       style: const TextStyle(
-                                                        color: Colors.white,
+                                                        color: Colors.deepOrange,
                                                         fontSize: 18.0,
                                                       ),
                                                     ),
