@@ -14,6 +14,7 @@ class SurvivorReadPage extends StatefulWidget {
 }
 
 class _SurvivorReadPageState extends State<SurvivorReadPage> {
+  // From victim table
   String natID = 'Girilmemiş';
   String name = 'Girilmemiş';
   String surname = 'Girilmemiş';
@@ -24,6 +25,44 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   String chronicIllness = 'Girilmemiş';
   double longitude = 0.0;
   double latitude = 0.0;
+
+  // From rescue table
+  String city = 'Girilmemiş';
+  String province = 'Girilmemiş';
+  String neighbourhood = 'Girilmemiş';
+  String street = 'Girilmemiş';
+  String building = 'Girilmemiş';
+  String rescueDate = 'Girilmemiş';
+
+  // From clinic table
+  String clinicHospitalName = 'Girilmemiş';
+  String clinicEnterDate = 'Girilmemiş';
+  String clinicDischargeDate = 'Girilmemiş';
+
+  // From er table
+  String erHospitalName = 'Girilmemiş';
+  String erEnterDate = 'Girilmemiş';
+  String erDischargeDate = 'Girilmemiş';
+
+  // From firstaid table
+  final Map<int, String> _victimConditions = {
+    0: 'Hafif Yaralı',
+    1: 'Yaralı',
+    2: 'Ağır Yaralı',
+    3: 'Ölü'
+  };
+  String firstaidHospitalName = 'Girilmemiş';
+  String victimCondition = 'Girilmemiş';
+  String firstaidAppliedDate = 'Girilmemiş';
+
+  // From morgue table
+  String morgueHospitalName = 'Girilmemiş';
+  String morgueEnterDate = 'Girilmemiş';
+  String morgueDischargeDate = 'Girilmemiş';
+
+  // From graveyard table
+  String graveyardName = 'Girilmemiş';
+  String burialDate = 'Girilmemiş';
 
   late FirebaseFirestore db;
 
@@ -36,6 +75,9 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
 
     // Get victim info from DB with ndefUID
     getVictimFromDB();
+    getRescueFromDB();
+    getClinicFromDB();
+    getGraveyardFromDB();
   }
 
   @override
@@ -310,6 +352,347 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                       )
                     ],
                   ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Enkazdan Çıkarılma Tarihi',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            rescueDate,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'İl',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            city,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'İlçe',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            province,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Mahalle',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            neighbourhood,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Cadde',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            street,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Bina Adı',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            building,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Hastane Adı',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            clinicHospitalName,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Hastaneye Giriş Tarihi',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            clinicEnterDate,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Hastaneden Çıkış Tarihi',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            clinicDischargeDate,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Mezarlık Adı',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            graveyardName,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 10)),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Text(
+                          'Defin Tarihi',
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5.0),
+                          color: Colors.black38,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                            burialDate,
+                            textAlign: TextAlign.start,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
 
                 ],
               ),
@@ -340,6 +723,56 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
       });
     } else {
       throw Exception('Failed to fetch victim data');
+    }
+  }
+
+  Future<void> getRescueFromDB() async {
+    final docRef = db.collection('rescue').doc(widget.ndefUID);
+    final docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+      setState(() {
+        city = data['city'] ?? city;
+        province = data['province'] ?? province;
+        neighbourhood = data['neighbourhood'] ?? neighbourhood;
+        street = data['street'] ?? street;
+        building = data['building'] ?? building;
+        rescueDate = data['rescue_datetime']?.toString() ?? rescueDate;
+      });
+    } else {
+      throw Exception('Failed to fetch rescue data');
+    }
+  }
+
+  Future<void> getClinicFromDB() async {
+    final docRef = db.collection('clinic').doc(widget.ndefUID);
+    final docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+      setState(() {
+        clinicHospitalName = data['hospital_name'] ?? clinicHospitalName;
+        clinicEnterDate = data['enter_datetime']?.toString() ?? clinicEnterDate;
+        clinicDischargeDate = data['discharge_datetime']?.toString() ?? clinicDischargeDate;
+      });
+    } else {
+      throw Exception('Failed to fetch clinic data');
+    }
+  }
+
+  Future<void> getGraveyardFromDB() async {
+    final docRef = db.collection('graveyard').doc(widget.ndefUID);
+    final docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+      setState(() {
+        graveyardName = data['graveyard_name'] ?? clinicHospitalName;
+        burialDate = data['burial_datetime']?.toString() ?? clinicDischargeDate;
+      });
+    } else {
+      throw Exception('Failed to fetch graveyard data');
     }
   }
 }
