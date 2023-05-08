@@ -39,8 +39,9 @@ class _MapPageState extends State<MapPage> {
       ),
       body: FlutterMap(
         options: MapOptions(
-          center: LatLng(39.50, 34.50),
-          minZoom: 10.0,
+          center: LatLng(widget.lat, widget.long),
+          minZoom: 150.0,
+          maxZoom: 5.0,
         ),
         children: [
           TileLayer(
