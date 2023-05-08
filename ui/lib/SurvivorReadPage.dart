@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'MapPage.dart';
+
 class SurvivorReadPage extends StatefulWidget {
   final String ndefUID;
 
@@ -24,6 +26,8 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   String chronicIllness = 'Girilmemiş';
   double longitude = 0.0;
   double latitude = 0.0;
+
+  final Color _primaryColor = const Color(0xff6a6b83);
 
   late FirebaseFirestore db;
 
@@ -309,6 +313,18 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                         ),
                       )
                     ],
+                  ),
+                  const Padding(padding: EdgeInsets.only(top: 5)),
+                  IconButton(
+                      icon: const Icon(Icons.location_on),
+                      color: _primaryColor,
+                      iconSize: 45.0,
+                      onPressed: () {
+                        Navigator.push<String>(
+                          context,
+                          MaterialPageRoute(builder: (context) => MapPage(lat: latitude, long: longitude)),
+                        );
+                      },
                   ),
 
                 ],
