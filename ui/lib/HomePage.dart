@@ -9,7 +9,7 @@ import 'package:ui/SearchPage.dart';
 import 'package:ui/SurvivorReadPage.dart';
 import 'package:ui/SurvivorWritePage.dart';
 import 'LoginPage.dart';
-import 'package:geolocation/geolocation.dart';
+import 'package:geolocator/geolocator.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -437,28 +437,48 @@ class _HomePageState extends State<HomePage> {
     await _storage.delete(key: 'password');
   }
 
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location services are disabled. Please enable the services')));
+      return false;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
 
   Future<void> writeLocationToDB(String ndefUID) async {
     try {
       final docRef = db.collection('victim').doc(ndefUID);
-
       Map<String, dynamic> record = {};
 
-      final GeolocationResult result = await Geolocation.requestLocationPermission(
-        permission: const LocationPermission(
-          android: LocationPermissionAndroid.fine,
-          ios: LocationPermissionIOS.whenInUse,
-        ),
-        openSettingsIfDenied: true,
-      );
+      final hasPermission = await _handleLocationPermission();
 
-      if(result.isSuccessful) {
+      if(hasPermission) {
         // location permission is granted (or was already granted before making the request)
 
-        // get last known location, which is a future rather than a stream (best for android)
-        LocationResult result = await Geolocation.lastKnownLocation();
-        double lat = result.location.latitude;
-        double long = result.location.longitude;
+        // get last known location, which is a future rather than a stream
+        Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        double lat = position.latitude;
+        double long = position.longitude;
 
         record['latitude'] = lat;
         record['longitude'] = long;
