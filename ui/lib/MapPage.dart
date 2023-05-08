@@ -40,8 +40,8 @@ class _MapPageState extends State<MapPage> {
       body: FlutterMap(
         options: MapOptions(
           center: LatLng(widget.lat, widget.long),
-          minZoom: 150.0,
-          maxZoom: 5.0,
+          minZoom: 3.0,
+          maxZoom: 17.0,
         ),
         children: [
           TileLayer(
@@ -67,8 +67,9 @@ class _MapPageState extends State<MapPage> {
           child: IconButton(
             icon: const Icon(Icons.location_on),
             color: Colors.red,
-            iconSize: 25.0,
+            iconSize: 45.0,
             onPressed: () {
+              // TODO: Long Lat Copy to Device's Clipboard
               print('Marker pressed');
             },
           ),

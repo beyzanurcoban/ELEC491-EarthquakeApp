@@ -316,33 +316,36 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                   ),
                   const Padding(padding: EdgeInsets.only(top: 5)),
                   ElevatedButton(
-                      onPressed: () {
-                        Navigator.push<String>(
-                          context,
-                          MaterialPageRoute(builder: (context) => MapPage(lat: latitude, long: longitude)),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(5),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Icon(Icons.location_on,
-                                size: 40.0,
-                                color: _primaryColor
-                            ),
-                            const Padding(padding: EdgeInsets.only(left: 10.0)),
-                            const Text('Konumu Haritada Göster'),
-                            const Spacer(),
-                            Icon(
-                              Icons.chevron_right,
-                              size: 40.0,
-                              color: _primaryColor,
-                            ),
-                          ],
-                        ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: _primaryColor,
+                    ),
+                    onPressed: () {
+                      Navigator.push<String>(
+                        context,
+                        MaterialPageRoute(builder: (context) => MapPage(lat: latitude, long: longitude)),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(Icons.map,
+                            size: 40.0,
+                            color: _primaryColor,
+                          ),
+                          const Padding(padding: EdgeInsets.only(left: 10.0)),
+                          const Text('Konumu Haritada Göster'),
+                          const Spacer(),
+                          Icon(
+                            Icons.chevron_right,
+                            size: 40.0,
+                            color: _primaryColor,
+                          ),
+                        ],
                       ),
+                    ),
                   ),
 
                 ],
