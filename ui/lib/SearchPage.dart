@@ -32,7 +32,7 @@ class _SearchPageState extends State<SearchPage> {
     'firstaid': 'İlk Yardım',
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma Lokasyonu',
-    'burial': 'Defin'
+    'burial': 'Mezarlık-Defin'
   };
 
   final Map<String, List<String>> _tableToListOfTables = {
