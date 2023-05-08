@@ -208,38 +208,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  geocoding:
+  geolocation:
     dependency: "direct main"
     description:
-      name: geocoding
-      sha256: b34c0501bbbaf3190b85bef3078b27cf66c28a8915c6d3af50d67f356aa7da31
+      name: geolocation
+      sha256: c04c58a379c501983585ee1a1957585d0fbb489b6daac6315ae39399a3f1c09f
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
-  geocoding_android:
-    dependency: transitive
-    description:
-      name: geocoding_android
-      sha256: "5a1fc0cec9b0497b44ca31c1fa8d1c891f3aded1053e6bb2eac075d3bd1bf046"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
-  geocoding_ios:
-    dependency: transitive
-    description:
-      name: geocoding_ios
-      sha256: c85495ce8fb34e4fbd2dd8fc5f79263d622d9f88c4af948c965daf6b27a7f3a1
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
-  geocoding_platform_interface:
-    dependency: transitive
-    description:
-      name: geocoding_platform_interface
-      sha256: "8848605d307d844d89937cdb4b8ad7dfa880552078f310fa24d8a460f6dddab4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
+    version: "1.1.2"
   http:
     dependency: "direct main"
     description:
@@ -397,6 +373,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  streams_channel:
+    dependency: transitive
+    description:
+      name: streams_channel
+      sha256: "1374e6442fbd8f812c443fad925edcb547e32808ae51159ee3b25f55da6dac2d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   string_scanner:
     dependency: transitive
     description:

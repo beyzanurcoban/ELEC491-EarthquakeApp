@@ -9,6 +9,7 @@ import 'package:ui/SearchPage.dart';
 import 'package:ui/SurvivorReadPage.dart';
 import 'package:ui/SurvivorWritePage.dart';
 import 'LoginPage.dart';
+import 'package:geolocation/geolocation.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -306,6 +307,9 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID);
+
       // Access database with Unique ID => ndefUID
       Navigator.push<String>(
         context,
@@ -330,6 +334,9 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID);
+
       // Fetch from database with UID
       Navigator.push<String>(
         context,
@@ -353,6 +360,9 @@ class _HomePageState extends State<HomePage> {
       var ndefUID = tag.data["ndef"]["identifier"]
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
+
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID);
 
       // Fetch from database with UID
       Navigator.push<String>(
@@ -425,5 +435,48 @@ class _HomePageState extends State<HomePage> {
   Future<void> _deleteCredentials() async {
     await _storage.delete(key: 'username');
     await _storage.delete(key: 'password');
+  }
+
+
+  Future<void> writeLocationToDB(String ndefUID) async {
+    try {
+      final docRef = db.collection('victim').doc(ndefUID);
+
+      Map<String, dynamic> record = {};
+
+      final GeolocationResult result = await Geolocation.requestLocationPermission(
+        permission: const LocationPermission(
+          android: LocationPermissionAndroid.fine,
+          ios: LocationPermissionIOS.whenInUse,
+        ),
+        openSettingsIfDenied: true,
+      );
+
+      if(result.isSuccessful) {
+        // location permission is granted (or was already granted before making the request)
+
+        // get last known location, which is a future rather than a stream (best for android)
+        LocationResult result = await Geolocation.lastKnownLocation();
+        double lat = result.location.latitude;
+        double long = result.location.longitude;
+
+        record['latitude'] = lat;
+        record['longitude'] = long;
+
+        final docSnap = await docRef.get();
+        if (docSnap.exists) {
+          await docRef.update(record);
+        } else {
+          await docRef.set(record);
+        }
+
+      } else {
+        // location permission is not granted
+        // user might have denied, but it's also possible that location service is not enabled, restricted, and user never saw the permission request dialog.
+        // TODO: If location is not accessible, discuss what to do
+      }
+    } catch (e) {
+      throw Exception('Failed to update location');
+    }
   }
 }

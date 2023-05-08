@@ -47,5 +47,16 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+
+    <!-- Add Location Permission -->
+	<!-- for iOS 11 + -->
+     <key>NSLocationWhenInUseUsageDescription</key>
+     <string>Depremzede Konumu Girmek İçin Lokasyona İzin Verin</string>
+     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+     <string>Depremzede Konumu Girmek İçin Lokasyona İzin Verin</string>
+
+     <!-- additionally for iOS 9/10, if you need always permission -->
+     <key>NSLocationAlwaysUsageDescription</key>
+     <string>Depremzede Konumu Girmek İçin Lokasyona İzin Verin</string>
 </dict>
 </plist>
