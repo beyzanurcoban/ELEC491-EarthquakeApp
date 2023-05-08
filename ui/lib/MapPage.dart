@@ -20,39 +20,16 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late FirebaseFirestore db;
+  List<Marker> allMarkers = [];
 
   @override
   void initState() {
     super.initState();
-    // Connect to DB
-    db = FirebaseFirestore.instance;
+    setMarkers();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Marker> allMarkers = [];
-
-    setMarkers() {
-      allMarkers.add(
-        Marker(
-          width: 45.0,
-          height: 45.0,
-          point: LatLng(widget.lat, widget.long),
-          builder: (context) => Container(
-            child: IconButton(
-              icon: const Icon(Icons.location_on),
-              color: Colors.red,
-              iconSize: 25.0,
-              onPressed: () {
-                print('Marker pressed');
-              },
-            ),
-          ),
-        ),
-      );
-      return allMarkers;
-    }
 
     return Scaffold(
       appBar: const CupertinoNavigationBar(
@@ -67,12 +44,34 @@ class _MapPageState extends State<MapPage> {
         ),
         children: [
           MarkerLayer(
-            markers: setMarkers(),
+            markers: allMarkers,
           ),
         ],
       ),
     );
   }
+
+  void setMarkers() {
+
+    allMarkers.add(
+      Marker(
+        width: 45.0,
+        height: 45.0,
+        point: LatLng(widget.lat, widget.long),
+        builder: (context) => Container(
+          child: IconButton(
+            icon: const Icon(Icons.location_on),
+            color: Colors.red,
+            iconSize: 25.0,
+            onPressed: () {
+              print('Marker pressed');
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
 
 }
 
