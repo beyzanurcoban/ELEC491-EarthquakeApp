@@ -28,7 +28,6 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
     'firstaid': 'İlk Yardım',
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma',
-    'ambulance': 'Ambulans',
     'burial': 'Mezarlık-Defin',
     'none': 'Yok'
   };

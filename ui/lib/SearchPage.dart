@@ -37,9 +37,10 @@ class _SearchPageState extends State<SearchPage> {
 
   final Map<String, List<String>> _tableToListOfTables = {
     'victim': ['victim'],
-    'clinic': ['clinic', 'er', 'firstaid', 'morgue'],
+    'clinic': ['clinic', 'er', 'morgue'],
     'rescue': ['rescue'],
     'burial': ['burial'],
+    'firstaid': ['firstaid'],
   };
 
 
@@ -100,7 +101,7 @@ class _SearchPageState extends State<SearchPage> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                searchAndDisplay(searchTerm);
+                                search(searchTerm);
                               },
                             ),
                           ),
@@ -220,7 +221,7 @@ class _SearchPageState extends State<SearchPage> {
                               ),
                               const Padding(padding: EdgeInsets.only(bottom: 4.0)),
                               Text(
-                                '${queryResult['province'] ?? 'İlçe Bilgisi Yok'}, ${queryResult['city'] ?? 'İl Bilgisi Yok'}',
+                                '${queryResult['city'] ?? 'İlçe Bilgisi Yok'}, ${queryResult['province'] ?? 'İl Bilgisi Yok'}',
                                 style: const TextStyle(
                                     color: Colors.black54,
                                 ),
@@ -252,7 +253,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Future<void> searchAndDisplay(String searchTerm) async {
+  Future<void> search(String searchTerm) async {
 
     setState(() {
       _queryResults.clear();
@@ -275,14 +276,19 @@ class _SearchPageState extends State<SearchPage> {
         completeQuery['victim_name'] = victimDocSnap.data()?['victim_name'];
         completeQuery['victim_surname'] = victimDocSnap.data()?['victim_surname'];
 
+        // HOSPITAL_MASTER
         for (var table in _tableToListOfTables['clinic'] ?? ['clinic']) {
           var docRef = db.collection(table).doc(ndefUID);
           var docSnap = await docRef.get();
 
-          if (docSnap.exists && docSnap.data()?['hospital_name'] != null) {
-            completeQuery['hospital_name'] = docSnap.data()?['hospital_name'];
+          if (docSnap.exists && docSnap.data()?['hospital_id'] != null) {
+            var docRefMaster = db.collection('hospital_master').doc(docSnap.data()!['hospital_id']);
+            var docSnapMaster = await docRefMaster.get();
+
+            completeQuery['hospital_name'] = docSnapMaster.data()?['hospital_name'];
           }
         }
+
 
         var rescueDocRef = db.collection('rescue').doc(ndefUID);
         var rescueDocSnap = await rescueDocRef.get();
@@ -290,6 +296,7 @@ class _SearchPageState extends State<SearchPage> {
         completeQuery['province'] = rescueDocSnap.data()?['province'];
         completeQuery['city'] = rescueDocSnap.data()?['city'];
 
+        // CEMETERY_MASTER
         var burialDocRef = db.collection('burial').doc(ndefUID);
         var burialDocSnap = await burialDocRef.get();
 
