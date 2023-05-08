@@ -315,16 +315,34 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     ],
                   ),
                   const Padding(padding: EdgeInsets.only(top: 5)),
-                  IconButton(
-                      icon: const Icon(Icons.location_on),
-                      color: _primaryColor,
-                      iconSize: 45.0,
+                  ElevatedButton(
                       onPressed: () {
                         Navigator.push<String>(
                           context,
                           MaterialPageRoute(builder: (context) => MapPage(lat: latitude, long: longitude)),
                         );
                       },
+                      child: Padding(
+                        padding: const EdgeInsets.all(5),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(Icons.location_on,
+                                size: 40.0,
+                                color: _primaryColor
+                            ),
+                            const Padding(padding: EdgeInsets.only(left: 10.0)),
+                            const Text('Konumu Haritada Göster'),
+                            const Spacer(),
+                            Icon(
+                              Icons.chevron_right,
+                              size: 40.0,
+                              color: _primaryColor,
+                            ),
+                          ],
+                        ),
+                      ),
                   ),
 
                 ],
