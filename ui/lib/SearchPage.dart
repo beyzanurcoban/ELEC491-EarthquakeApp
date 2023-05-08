@@ -233,7 +233,7 @@ class _SearchPageState extends State<SearchPage> {
                                 ),
                               ),
                               Text(
-                                'Defin: ${queryResult['graveyard_name'] ?? 'Girilmemiş'}',
+                                'Defin: ${queryResult['cemetery_name'] ?? 'Girilmemiş'}',
                                 style: const TextStyle(
                                   color: Colors.black54,
                                 ),
@@ -260,9 +260,12 @@ class _SearchPageState extends State<SearchPage> {
     });
 
     for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
+      // SEARCH IN ALL RELATED TABLES
+      // TODO: JOIN MASTER TABLES
       var docRefs = await db.collection(table).get();
       var docs = docRefs.docs.where((doc) => doc.data().values.any((value) => value.toString().contains(searchTerm)));
 
+      // DISPLAY INFO ON BUTTON
       for (var element in docs) {
         String ndefUID = element.id.toString();
 
@@ -270,6 +273,7 @@ class _SearchPageState extends State<SearchPage> {
 
         completeQuery['ndefUID'] = ndefUID;
 
+        // VICTIM TABLE
         var victimDocRef = db.collection('victim').doc(ndefUID);
         var victimDocSnap = await victimDocRef.get();
 
@@ -289,7 +293,7 @@ class _SearchPageState extends State<SearchPage> {
           }
         }
 
-
+        // RESCUE TABLE
         var rescueDocRef = db.collection('rescue').doc(ndefUID);
         var rescueDocSnap = await rescueDocRef.get();
 
@@ -300,7 +304,12 @@ class _SearchPageState extends State<SearchPage> {
         var burialDocRef = db.collection('burial').doc(ndefUID);
         var burialDocSnap = await burialDocRef.get();
 
-        completeQuery['graveyard_name'] = burialDocSnap.data()?['graveyard_name'];
+        if (burialDocSnap.exists && burialDocSnap.data()?['cemetery_id'] != null) {
+          var docRefMaster = db.collection('cemetery_master').doc(burialDocSnap.data()!['cemetery_id']);
+          var docSnapMaster = await docRefMaster.get();
+
+          completeQuery['cemetery_name'] = docSnapMaster.data()?['cemetery_name'];
+        }
 
         setState(() {
           if (!_queryResults.contains(completeQuery)) {
