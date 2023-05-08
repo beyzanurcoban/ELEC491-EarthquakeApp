@@ -43,6 +43,10 @@ class _MapPageState extends State<MapPage> {
           minZoom: 10.0,
         ),
         children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.app',
+          ),
           MarkerLayer(
             markers: allMarkers,
           ),
