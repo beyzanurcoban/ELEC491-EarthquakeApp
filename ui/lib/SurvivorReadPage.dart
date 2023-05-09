@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 
 import 'MapPage.dart';
 
@@ -24,6 +25,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   String chronicIllness = 'Girilmemiş';
   double longitude = 0.0;
   double latitude = 0.0;
+  String address = '';
 
   final Color _primaryColor = const Color(0xff6a6b83);
 
@@ -301,7 +303,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                         child: Padding(
                           padding: const EdgeInsets.all(5),
                           child: Text(
-                            '$latitude $longitude',
+                            address,
                             textAlign: TextAlign.start,
                             style: const TextStyle(
                                 color: Colors.white,
@@ -376,5 +378,9 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
     } else {
       throw Exception('Failed to fetch victim data');
     }
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    var first = placemarks.first;
+    address = '${first.name} ${first.locality} ${first.administrativeArea} ${first.street}';
   }
 }
