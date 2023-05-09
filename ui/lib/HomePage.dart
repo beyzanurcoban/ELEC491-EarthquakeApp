@@ -309,6 +309,18 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Check if the NFC tag UID exists in the victim table
+  Future<bool> victimExists(String ndefUID) async {
+    final docRef = db.collection('victim').doc(ndefUID);
+    final docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   void _tagRead() {
     setState(() {
       _nfcSessionRunning = true;
@@ -322,25 +334,30 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      setState(() {
-        _dialogText = 'Profil yükleniyor...';
-      });
-
-      // Write last active location of the NFC tag to database
-      writeLocationToDB(ndefUID).then((_) {
+      if (await victimExists(ndefUID)) {
         setState(() {
-          _nfcSessionRunning = false;
-          _dialogText = 'Etiket aranıyor...';
+          _dialogText = 'Profil yükleniyor...';
         });
 
-        // Access database with Unique ID => ndefUID
-        Navigator.push<String>(
-          context,
-          MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
-        );
-      });
+        // Write last active location of the NFC tag to database
+        writeLocationToDB(ndefUID).then((_) {
+          setState(() {
+            _nfcSessionRunning = false;
+            _dialogText = 'Etiket aranıyor...';
+          });
 
-      NfcManager.instance.stopSession();
+          // Access database with Unique ID => ndefUID
+          Navigator.push<String>(
+            context,
+            MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
+          );
+        });
+
+        NfcManager.instance.stopSession();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Depremzede kaydı bulunamadı.')));
+      }
     });
   }
 
@@ -389,29 +406,34 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      setState(() {
-        _dialogText = 'Profil yükleniyor...';
-      });
-
-      // Write last active location of the NFC tag to database
-      writeLocationToDB(ndefUID).then((_) {
+      if(await victimExists(ndefUID)) {
         setState(() {
-          _nfcSessionRunning = false;
-          _dialogText = 'Etiket aranıyor...';
+          _dialogText = 'Profil yükleniyor...';
         });
 
-        // Fetch from database with UID
-        Navigator.push<String>(
-          context,
-          MaterialPageRoute(builder: (context) => RoleBasedRecordWritePage(
-            ndefUID: ndefUID,
-            username: widget.username,
-            role: _userRole,
-          )),
-        );
-      });
+        // Write last active location of the NFC tag to database
+        writeLocationToDB(ndefUID).then((_) {
+          setState(() {
+            _nfcSessionRunning = false;
+            _dialogText = 'Etiket aranıyor...';
+          });
 
-      NfcManager.instance.stopSession();
+          // Fetch from database with UID
+          Navigator.push<String>(
+            context,
+            MaterialPageRoute(builder: (context) => RoleBasedRecordWritePage(
+              ndefUID: ndefUID,
+              username: widget.username,
+              role: _userRole,
+            )),
+          );
+        });
+
+        NfcManager.instance.stopSession();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Lütfen önce etikete yazınız.')));
+      }
     });
   }
 
@@ -533,7 +555,8 @@ class _HomePageState extends State<HomePage> {
       } else {
         // location permission is not granted
         // user might have denied, but it's also possible that location service is not enabled, restricted, and user never saw the permission request dialog.
-        // TODO: If location is not accessible, discuss what to do
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Depremzede lokasyonu güncellemek için konum servislerini açın.')));
       }
     } catch (e) {
       throw Exception('Failed to update location');
