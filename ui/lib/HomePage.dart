@@ -308,17 +308,18 @@ class _HomePageState extends State<HomePage> {
           .join('');
 
       // Write last active location of the NFC tag to database
-      await writeLocationToDB(ndefUID);
+      writeLocationToDB(ndefUID).then((_) {
+        setState(() {
+          _nfcSessionRunning = false;
+        });
 
-      // Access database with Unique ID => ndefUID
-      Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
-      );
-
-      setState(() {
-        _nfcSessionRunning = false;
+        // Access database with Unique ID => ndefUID
+        Navigator.push<String>(
+          context,
+          MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
+        );
       });
+
       NfcManager.instance.stopSession();
     });
   }
