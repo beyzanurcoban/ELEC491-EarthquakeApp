@@ -762,6 +762,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
       throw Exception('Failed to fetch victim data');
     }
 
+    // Get the full address from the latitude and longitude info
     List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
     var first = placemarks.first;
     setState(() {
