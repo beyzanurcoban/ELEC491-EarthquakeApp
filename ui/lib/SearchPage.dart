@@ -300,11 +300,13 @@ class _SearchPageState extends State<SearchPage> {
     searchTerms.addAll(ids);
 
     for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
+
       // SEARCH IN ALL RELATED TABLES
       var docRefs = await db.collection(table).get();
       var docs = docRefs.docs.where((doc)
         => doc.data().values.any((value)
-        => value.toString().contains(searchTerm)));
+        => searchTerms.any((searchTerm)
+        => value.toString().contains(searchTerm))));
 
 
       // DISPLAY INFO ON BUTTON
