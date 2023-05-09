@@ -388,6 +388,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                         ],
                       ),
                     ),
+                  ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
