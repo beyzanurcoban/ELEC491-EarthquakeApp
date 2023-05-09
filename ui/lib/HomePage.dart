@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   bool _canWriteVictim = false;
   String _dialogText = 'Etiket aranıyor...';
 
-  Color _primaryColor = const Color(0xff6a6b83);
+  final Color _primaryColor = const Color(0xff6a6b83);
 
   final Map<String, String> _roles = {
     'clinic': 'Hastane',
@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma',
     'ambulance': 'Ambulans',
+    'burial': 'Mezarlık-Defin',
     'none': 'Yok'
   };
 
@@ -117,13 +118,14 @@ class _HomePageState extends State<HomePage> {
                                       child: SizedBox(
                                         height: 60,
                                         child: ElevatedButton(
+
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                           ),
-                                          onPressed: _tagRead,
+                                          onPressed: !_nfcSessionRunning ? _tagRead : null,
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
@@ -162,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                                                 borderRadius: BorderRadius.circular(10),
                                               ),
                                             ),
-                                            onPressed: _ndefWrite,
+                                            onPressed: !_nfcSessionRunning ? _ndefWrite : null,
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: const [
@@ -208,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                                                     borderRadius: BorderRadius.circular(10),
                                                   ),
                                                 ),
-                                                onPressed: _ndefRoleBasedRecordWrite,
+                                                onPressed: !_nfcSessionRunning ? _ndefRoleBasedRecordWrite : null,
                                                 child: Row(
                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
@@ -237,13 +239,13 @@ class _HomePageState extends State<HomePage> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 16),
                                 child: TextButton(
-                                    onPressed: () async {
+                                    onPressed: !_nfcSessionRunning ? () async {
                                       _deleteCredentials();
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(builder: (context) => const LoginPage()),
                                       );
-                                    },
+                                    } : null,
                                     child: const Text('Çıkış Yap')
                                 ),
                               ),
@@ -272,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                                 ]
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.all(20.0),
+                                padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -280,8 +282,18 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       _dialogText,
                                     ),
-                                    Padding(padding: EdgeInsets.only(top: 20.0)),
-                                    CircularProgressIndicator(),
+                                    const Padding(padding: EdgeInsets.only(top: 20.0)),
+                                    const CircularProgressIndicator(),
+                                    const Padding(padding: EdgeInsets.only(top: 20.0)),
+                                    TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _nfcSessionRunning = false;
+                                        });
+                                        NfcManager.instance.stopSession();
+                                      },
+                                      child: const Text('İptal Et'),
+                                    )
                                   ],
                                 ),
                               ),
@@ -445,6 +457,12 @@ class _HomePageState extends State<HomePage> {
         _roleExists = data['rescue'] ?? false;
         if (_roleExists) {
           _userRole = 'rescue';
+          return;
+        }
+
+        _roleExists = data['burial'] ?? false;
+        if (_roleExists) {
+          _userRole = 'burial';
           return;
         }
 

@@ -26,20 +26,19 @@ class _SearchPageState extends State<SearchPage> {
   List<Map<String, dynamic>> _queryResults = <Map<String, dynamic>>[];
 
   final Map<String, String> _tables = {
-    'victim': 'Depremzede',
-    'clinic': 'Hastane',
-    'er': 'Acil',
-    'firstaid': 'İlk Yardım',
-    'morgue': 'Morg',
+    'victim': 'Depremzede Bilgisi',
+    'clinic': 'Hastane Adı',
+    'firstaid': 'Ambulans Plakası',
     'rescue': 'Arama-Kurtarma Lokasyonu',
-    'burial': 'Defin'
+    'burial': 'Mezarlık Adı'
   };
 
   final Map<String, List<String>> _tableToListOfTables = {
     'victim': ['victim'],
-    'clinic': ['clinic', 'er', 'firstaid', 'morgue'],
+    'clinic': ['clinic', 'er', 'morgue'],
     'rescue': ['rescue'],
     'burial': ['burial'],
+    'firstaid': ['firstaid'],
   };
 
 
@@ -100,7 +99,7 @@ class _SearchPageState extends State<SearchPage> {
                                 setState(() {
                                   _isLoading = true;
                                 });
-                                searchAndDisplay(searchTerm);
+                                search(searchTerm);
                               },
                             ),
                           ),
@@ -220,7 +219,7 @@ class _SearchPageState extends State<SearchPage> {
                               ),
                               const Padding(padding: EdgeInsets.only(bottom: 4.0)),
                               Text(
-                                '${queryResult['province'] ?? 'İlçe Bilgisi Yok'}, ${queryResult['city'] ?? 'İl Bilgisi Yok'}',
+                                '${queryResult['city'] ?? 'İlçe Bilgisi Yok'}, ${queryResult['province'] ?? 'İl Bilgisi Yok'}',
                                 style: const TextStyle(
                                     color: Colors.black54,
                                 ),
@@ -232,7 +231,7 @@ class _SearchPageState extends State<SearchPage> {
                                 ),
                               ),
                               Text(
-                                'Defin: ${queryResult['graveyard_name'] ?? 'Girilmemiş'}',
+                                'Mezarlık: ${queryResult['cemetery_name'] ?? 'Girilmemiş'}',
                                 style: const TextStyle(
                                   color: Colors.black54,
                                 ),
@@ -252,16 +251,65 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Future<void> searchAndDisplay(String searchTerm) async {
+  Future<void> search(String searchTerm) async {
 
     setState(() {
       _queryResults.clear();
     });
 
-    for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
-      var docRefs = await db.collection(table).get();
-      var docs = docRefs.docs.where((doc) => doc.data().values.any((value) => value.toString().contains(searchTerm)));
+    // TODO: JOIN MASTER TABLES
+    // Search for any occurrences of the search term in master tables
+    // Get IDs of entries where search term matches their name
+    List<String> ids = [];
 
+    if (_selectedTable == 'clinic') {
+      var masterDocRefs = await db.collection('hospital_master').get();
+      var masterDocs = masterDocRefs.docs.where((doc)
+      => doc.data().values.any((value)
+      => value.toString().contains(searchTerm)));
+
+      for (var element in masterDocs) {
+        ids.add(element.id.toString());
+      }
+    }
+
+    if (_selectedTable == 'burial') {
+      var masterDocRefs = await db.collection('cemetery_master').get();
+      var masterDocs = masterDocRefs.docs.where((doc)
+      => doc.data().values.any((value)
+      => value.toString().contains(searchTerm)));
+
+      for (var element in masterDocs) {
+        ids.add(element.id.toString());
+      }
+    }
+
+    if (_selectedTable == 'firstaid') {
+      var masterDocRefs = await db.collection('ambulance_master').get();
+      var masterDocs = masterDocRefs.docs.where((doc)
+      => doc.data().values.any((value)
+      => value.toString().contains(searchTerm)));
+
+      for (var element in masterDocs) {
+        ids.add(element.id.toString());
+      }
+    }
+
+    List<String> searchTerms = [];
+    searchTerms.add(searchTerm);
+    searchTerms.addAll(ids);
+
+    for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
+
+      // SEARCH IN ALL RELATED TABLES
+      var docRefs = await db.collection(table).get();
+      var docs = docRefs.docs.where((doc)
+        => doc.data().values.any((value)
+        => searchTerms.any((searchTerm)
+        => value.toString().contains(searchTerm))));
+
+
+      // DISPLAY INFO ON BUTTON
       for (var element in docs) {
         String ndefUID = element.id.toString();
 
@@ -269,31 +317,43 @@ class _SearchPageState extends State<SearchPage> {
 
         completeQuery['ndefUID'] = ndefUID;
 
+        // VICTIM TABLE
         var victimDocRef = db.collection('victim').doc(ndefUID);
         var victimDocSnap = await victimDocRef.get();
 
         completeQuery['victim_name'] = victimDocSnap.data()?['victim_name'];
         completeQuery['victim_surname'] = victimDocSnap.data()?['victim_surname'];
 
+        // HOSPITAL_MASTER
         for (var table in _tableToListOfTables['clinic'] ?? ['clinic']) {
           var docRef = db.collection(table).doc(ndefUID);
           var docSnap = await docRef.get();
 
-          if (docSnap.exists && docSnap.data()?['hospital_name'] != null) {
-            completeQuery['hospital_name'] = docSnap.data()?['hospital_name'];
+          if (docSnap.exists && docSnap.data()?['hospital_id'] != null) {
+            var docRefMaster = db.collection('hospital_master').doc(docSnap.data()!['hospital_id']);
+            var docSnapMaster = await docRefMaster.get();
+
+            completeQuery['hospital_name'] = docSnapMaster.data()?['hospital_name'];
           }
         }
 
+        // RESCUE TABLE
         var rescueDocRef = db.collection('rescue').doc(ndefUID);
         var rescueDocSnap = await rescueDocRef.get();
 
         completeQuery['province'] = rescueDocSnap.data()?['province'];
         completeQuery['city'] = rescueDocSnap.data()?['city'];
 
+        // CEMETERY_MASTER
         var burialDocRef = db.collection('burial').doc(ndefUID);
         var burialDocSnap = await burialDocRef.get();
 
-        completeQuery['graveyard_name'] = burialDocSnap.data()?['graveyard_name'];
+        if (burialDocSnap.exists && burialDocSnap.data()?['cemetery_id'] != null) {
+          var docRefMaster = db.collection('cemetery_master').doc(burialDocSnap.data()!['cemetery_id']);
+          var docSnapMaster = await docRefMaster.get();
+
+          completeQuery['cemetery_name'] = docSnapMaster.data()?['cemetery_name'];
+        }
 
         setState(() {
           if (!_queryResults.contains(completeQuery)) {

@@ -33,7 +33,6 @@ class _SignupPageState extends State<SignupPage> {
     'firstaid': 'İlk Yardım',
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma',
-    //OPTIONAL: 'ambulance': 'Ambulans'
   };
 
   String _selectedRole = 'clinic';
