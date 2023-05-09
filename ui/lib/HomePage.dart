@@ -353,11 +353,17 @@ class _HomePageState extends State<HomePage> {
           );
         });
 
-        NfcManager.instance.stopSession();
       } else {
+        setState(() {
+          _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Depremzede kaydı bulunamadı.')));
       }
+
+      NfcManager.instance.stopSession();
     });
   }
 
@@ -429,11 +435,17 @@ class _HomePageState extends State<HomePage> {
           );
         });
 
-        NfcManager.instance.stopSession();
       } else {
+        setState(() {
+          _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('Lütfen önce etikete yazınız.')));
       }
+
+      NfcManager.instance.stopSession();
     });
   }
 
