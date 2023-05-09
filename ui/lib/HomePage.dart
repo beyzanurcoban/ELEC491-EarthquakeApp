@@ -300,7 +300,9 @@ class _HomePageState extends State<HomePage> {
   void _tagRead() {
     setState(() {
       _nfcSessionRunning = true;
+      _dialogText = 'Etiket aranıyor...';
     });
+
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
 
       // Get ndefUID from NFC tag
@@ -316,6 +318,7 @@ class _HomePageState extends State<HomePage> {
       writeLocationToDB(ndefUID).then((_) {
         setState(() {
           _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
         });
 
         // Access database with Unique ID => ndefUID
@@ -326,16 +329,13 @@ class _HomePageState extends State<HomePage> {
       });
 
       NfcManager.instance.stopSession();
-
-      setState(() {
-        _dialogText = 'Etiket aranıyor...';
-      });
     });
   }
 
   void _ndefWrite() {
     setState(() {
       _nfcSessionRunning = true;
+      _dialogText = 'Etiket aranıyor...';
     });
 
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
@@ -352,6 +352,7 @@ class _HomePageState extends State<HomePage> {
       writeLocationToDB(ndefUID).then((_) {
         setState(() {
           _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
         });
 
         // Fetch from database with UID
@@ -362,10 +363,6 @@ class _HomePageState extends State<HomePage> {
       });
 
       NfcManager.instance.stopSession();
-
-      setState(() {
-        _dialogText = 'Etiket aranıyor...';
-      });
     });
   }
 
@@ -388,6 +385,7 @@ class _HomePageState extends State<HomePage> {
       writeLocationToDB(ndefUID).then((_) {
         setState(() {
           _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
         });
 
         // Fetch from database with UID
@@ -402,10 +400,6 @@ class _HomePageState extends State<HomePage> {
       });
 
       NfcManager.instance.stopSession();
-
-      setState(() {
-        _dialogText = 'Etiket aranıyor...';
-      });
     });
   }
 
