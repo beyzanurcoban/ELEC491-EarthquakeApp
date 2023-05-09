@@ -308,7 +308,7 @@ class _HomePageState extends State<HomePage> {
           .join('');
 
       // Write last active location of the NFC tag to database
-      writeLocationToDB(ndefUID);
+      await writeLocationToDB(ndefUID);
 
       // Access database with Unique ID => ndefUID
       Navigator.push<String>(
@@ -335,7 +335,7 @@ class _HomePageState extends State<HomePage> {
           .join('');
 
       // Write last active location of the NFC tag to database
-      writeLocationToDB(ndefUID);
+      await writeLocationToDB(ndefUID);
 
       // Fetch from database with UID
       Navigator.push<String>(
@@ -362,7 +362,7 @@ class _HomePageState extends State<HomePage> {
           .join('');
 
       // Write last active location of the NFC tag to database
-      writeLocationToDB(ndefUID);
+      await writeLocationToDB(ndefUID);
 
       // Fetch from database with UID
       Navigator.push<String>(
