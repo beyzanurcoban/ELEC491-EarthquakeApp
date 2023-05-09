@@ -26,13 +26,11 @@ class _SearchPageState extends State<SearchPage> {
   List<Map<String, dynamic>> _queryResults = <Map<String, dynamic>>[];
 
   final Map<String, String> _tables = {
-    'victim': 'Depremzede',
-    'clinic': 'Hastane',
-    'er': 'Acil',
-    'firstaid': 'İlk Yardım',
-    'morgue': 'Morg',
+    'victim': 'Depremzede Bilgisi',
+    'clinic': 'Hastane Adı',
+    'firstaid': 'Ambulans Plakası',
     'rescue': 'Arama-Kurtarma Lokasyonu',
-    'burial': 'Mezarlık-Defin'
+    'burial': 'Mezarlık Adı'
   };
 
   final Map<String, List<String>> _tableToListOfTables = {
@@ -233,7 +231,7 @@ class _SearchPageState extends State<SearchPage> {
                                 ),
                               ),
                               Text(
-                                'Defin: ${queryResult['cemetery_name'] ?? 'Girilmemiş'}',
+                                'Mezarlık: ${queryResult['cemetery_name'] ?? 'Girilmemiş'}',
                                 style: const TextStyle(
                                   color: Colors.black54,
                                 ),
@@ -261,9 +259,11 @@ class _SearchPageState extends State<SearchPage> {
 
     for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
       // SEARCH IN ALL RELATED TABLES
-      // TODO: JOIN MASTER TABLES
       var docRefs = await db.collection(table).get();
       var docs = docRefs.docs.where((doc) => doc.data().values.any((value) => value.toString().contains(searchTerm)));
+
+      // TODO: JOIN MASTER TABLES
+
 
       // DISPLAY INFO ON BUTTON
       for (var element in docs) {
