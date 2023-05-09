@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   bool _nfcSessionRunning = false;
   bool _roleExists = false;
   bool _canWriteVictim = false;
+  String _dialogText = 'Etiket aranıyor...';
 
   Color _primaryColor = const Color(0xff6a6b83);
 
@@ -275,9 +276,9 @@ class _HomePageState extends State<HomePage> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: const [
+                                  children: [
                                     Text(
-                                      'Etiket Aranıyor...'
+                                      _dialogText,
                                     ),
                                     Padding(padding: EdgeInsets.only(top: 20.0)),
                                     CircularProgressIndicator(),
@@ -307,6 +308,10 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
+      setState(() {
+        _dialogText = 'Profil yükleniyor...';
+      });
+
       // Write last active location of the NFC tag to database
       writeLocationToDB(ndefUID).then((_) {
         setState(() {
@@ -321,6 +326,10 @@ class _HomePageState extends State<HomePage> {
       });
 
       NfcManager.instance.stopSession();
+
+      setState(() {
+        _dialogText = 'Etiket aranıyor...';
+      });
     });
   }
 
@@ -335,19 +344,28 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      // Write last active location of the NFC tag to database
-      await writeLocationToDB(ndefUID);
+      setState(() {
+        _dialogText = 'Profil yükleniyor...';
+      });
 
-      // Fetch from database with UID
-      Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID,)),
-      );
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID).then((_) {
+        setState(() {
+          _nfcSessionRunning = false;
+        });
+
+        // Fetch from database with UID
+        Navigator.push<String>(
+          context,
+          MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID,)),
+        );
+      });
+
+      NfcManager.instance.stopSession();
 
       setState(() {
-        _nfcSessionRunning = false;
+        _dialogText = 'Etiket aranıyor...';
       });
-      NfcManager.instance.stopSession();
     });
   }
 
@@ -362,23 +380,32 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      // Write last active location of the NFC tag to database
-      await writeLocationToDB(ndefUID);
+      setState(() {
+        _dialogText = 'Profil yükleniyor...';
+      });
 
-      // Fetch from database with UID
-      Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => RoleBasedRecordWritePage(
-          ndefUID: ndefUID,
-          username: widget.username,
-          role: _userRole,
-        )),
-      );
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID).then((_) {
+        setState(() {
+          _nfcSessionRunning = false;
+        });
+
+        // Fetch from database with UID
+        Navigator.push<String>(
+          context,
+          MaterialPageRoute(builder: (context) => RoleBasedRecordWritePage(
+            ndefUID: ndefUID,
+            username: widget.username,
+            role: _userRole,
+          )),
+        );
+      });
+
+      NfcManager.instance.stopSession();
 
       setState(() {
-        _nfcSessionRunning = false;
+        _dialogText = 'Etiket aranıyor...';
       });
-      NfcManager.instance.stopSession();
     });
   }
 
