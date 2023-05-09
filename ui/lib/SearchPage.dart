@@ -257,7 +257,14 @@ class _SearchPageState extends State<SearchPage> {
       _queryResults.clear();
     });
 
-    // TODO: JOIN MASTER TABLES
+    List<String> searchTerms = [];
+
+    // PARSE SEARCH TERMS IN INPUT
+    searchTerms.addAll(searchTerm.split(' '));
+    searchTerms.remove('');
+    print(searchTerms);
+
+    // JOIN MASTER TABLES
     // Search for any occurrences of the search term in master tables
     // Get IDs of entries where search term matches their name
     List<String> ids = [];
@@ -266,7 +273,8 @@ class _SearchPageState extends State<SearchPage> {
       var masterDocRefs = await db.collection('hospital_master').get();
       var masterDocs = masterDocRefs.docs.where((doc)
       => doc.data().values.any((value)
-      => value.toString().contains(searchTerm)));
+      => searchTerms.any((searchTerm)
+      => value.toString().toLowerCase().contains(searchTerm.toLowerCase()))));
 
       for (var element in masterDocs) {
         ids.add(element.id.toString());
@@ -277,7 +285,8 @@ class _SearchPageState extends State<SearchPage> {
       var masterDocRefs = await db.collection('cemetery_master').get();
       var masterDocs = masterDocRefs.docs.where((doc)
       => doc.data().values.any((value)
-      => value.toString().contains(searchTerm)));
+      => searchTerms.any((searchTerm)
+      => value.toString().toLowerCase().contains(searchTerm.toLowerCase()))));
 
       for (var element in masterDocs) {
         ids.add(element.id.toString());
@@ -288,16 +297,16 @@ class _SearchPageState extends State<SearchPage> {
       var masterDocRefs = await db.collection('ambulance_master').get();
       var masterDocs = masterDocRefs.docs.where((doc)
       => doc.data().values.any((value)
-      => value.toString().contains(searchTerm)));
+      => searchTerms.any((searchTerm)
+      => value.toString().toLowerCase().contains(searchTerm.toLowerCase()))));
 
       for (var element in masterDocs) {
         ids.add(element.id.toString());
       }
     }
 
-    List<String> searchTerms = [];
-    searchTerms.add(searchTerm);
     searchTerms.addAll(ids);
+    print(searchTerms);
 
     for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
 
@@ -306,7 +315,7 @@ class _SearchPageState extends State<SearchPage> {
       var docs = docRefs.docs.where((doc)
         => doc.data().values.any((value)
         => searchTerms.any((searchTerm)
-        => value.toString().contains(searchTerm))));
+        => value.toString().toLowerCase().contains(searchTerm.toLowerCase()))));
 
 
       // DISPLAY INFO ON BUTTON
