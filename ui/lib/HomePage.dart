@@ -9,6 +9,7 @@ import 'package:ui/SearchPage.dart';
 import 'package:ui/SurvivorReadPage.dart';
 import 'package:ui/SurvivorWritePage.dart';
 import 'LoginPage.dart';
+import 'package:geolocator/geolocator.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -23,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   bool _nfcSessionRunning = false;
   bool _roleExists = false;
   bool _canWriteVictim = false;
+  String _dialogText = 'Etiket aranıyor...';
 
   final Color _primaryColor = const Color(0xff6a6b83);
 
@@ -277,7 +279,9 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    const Text('Etiket Aranıyor...'),
+                                    Text(
+                                      _dialogText,
+                                    ),
                                     const Padding(padding: EdgeInsets.only(top: 20.0)),
                                     const CircularProgressIndicator(),
                                     const Padding(padding: EdgeInsets.only(top: 20.0)),
@@ -308,7 +312,9 @@ class _HomePageState extends State<HomePage> {
   void _tagRead() {
     setState(() {
       _nfcSessionRunning = true;
+      _dialogText = 'Etiket aranıyor...';
     });
+
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
 
       // Get ndefUID from NFC tag
@@ -316,15 +322,24 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      // Access database with Unique ID => ndefUID
-      Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
-      );
-
       setState(() {
-        _nfcSessionRunning = false;
+        _dialogText = 'Profil yükleniyor...';
       });
+
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID).then((_) {
+        setState(() {
+          _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
+        });
+
+        // Access database with Unique ID => ndefUID
+        Navigator.push<String>(
+          context,
+          MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
+        );
+      });
+
       NfcManager.instance.stopSession();
     });
   }
@@ -332,6 +347,7 @@ class _HomePageState extends State<HomePage> {
   void _ndefWrite() {
     setState(() {
       _nfcSessionRunning = true;
+      _dialogText = 'Etiket aranıyor...';
     });
 
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
@@ -340,15 +356,24 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      // Fetch from database with UID
-      Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID,)),
-      );
-
       setState(() {
-        _nfcSessionRunning = false;
+        _dialogText = 'Profil yükleniyor...';
       });
+
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID).then((_) {
+        setState(() {
+          _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
+        });
+
+        // Fetch from database with UID
+        Navigator.push<String>(
+          context,
+          MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID,)),
+        );
+      });
+
       NfcManager.instance.stopSession();
     });
   }
@@ -364,19 +389,28 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      // Fetch from database with UID
-      Navigator.push<String>(
-        context,
-        MaterialPageRoute(builder: (context) => RoleBasedRecordWritePage(
-          ndefUID: ndefUID,
-          username: widget.username,
-          role: _userRole,
-        )),
-      );
-
       setState(() {
-        _nfcSessionRunning = false;
+        _dialogText = 'Profil yükleniyor...';
       });
+
+      // Write last active location of the NFC tag to database
+      writeLocationToDB(ndefUID).then((_) {
+        setState(() {
+          _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
+        });
+
+        // Fetch from database with UID
+        Navigator.push<String>(
+          context,
+          MaterialPageRoute(builder: (context) => RoleBasedRecordWritePage(
+            ndefUID: ndefUID,
+            username: widget.username,
+            role: _userRole,
+          )),
+        );
+      });
+
       NfcManager.instance.stopSession();
     });
   }
@@ -441,5 +475,68 @@ class _HomePageState extends State<HomePage> {
   Future<void> _deleteCredentials() async {
     await _storage.delete(key: 'username');
     await _storage.delete(key: 'password');
+  }
+
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location services are disabled. Please enable the services')));
+      return false;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location permissions are permanently denied, we cannot request permissions.')));
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> writeLocationToDB(String ndefUID) async {
+    try {
+      final docRef = db.collection('victim').doc(ndefUID);
+      Map<String, dynamic> record = {};
+
+      final hasPermission = await _handleLocationPermission();
+
+      if(hasPermission) {
+        // location permission is granted (or was already granted before making the request)
+
+        // get last known location, which is a future rather than a stream
+        Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+        double lat = position.latitude;
+        double long = position.longitude;
+
+        record['latitude'] = lat;
+        record['longitude'] = long;
+
+        final docSnap = await docRef.get();
+        if (docSnap.exists) {
+          await docRef.update(record);
+        } else {
+          await docRef.set(record);
+        }
+
+      } else {
+        // location permission is not granted
+        // user might have denied, but it's also possible that location service is not enabled, restricted, and user never saw the permission request dialog.
+        // TODO: If location is not accessible, discuss what to do
+      }
+    } catch (e) {
+      throw Exception('Failed to update location');
+    }
   }
 }

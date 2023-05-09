@@ -1,8 +1,9 @@
-import 'dart:convert';
-import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+
+import 'MapPage.dart';
 
 class SurvivorReadPage extends StatefulWidget {
   final String ndefUID;
@@ -25,6 +26,9 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   String chronicIllness = 'Girilmemiş';
   double longitude = 0.0;
   double latitude = 0.0;
+  String address = '';
+
+  final Color _primaryColor = const Color(0xff6a6b83);
 
   // From rescue table
   String city = 'Girilmemiş';
@@ -341,7 +345,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                         child: Padding(
                           padding: const EdgeInsets.all(5),
                           child: Text(
-                            '$latitude $longitude',
+                            address,
                             textAlign: TextAlign.start,
                             style: const TextStyle(
                                 color: Colors.white,
@@ -352,6 +356,38 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                       )
                     ],
                   ),
+                  const Padding(padding: EdgeInsets.only(top: 5)),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: _primaryColor,
+                    ),
+                    onPressed: () {
+                      Navigator.push<String>(
+                        context,
+                        MaterialPageRoute(builder: (context) => MapPage(lat: latitude, long: longitude)),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(Icons.map,
+                            size: 40.0,
+                            color: _primaryColor,
+                          ),
+                          const Padding(padding: EdgeInsets.only(left: 10.0)),
+                          const Text('Konumu Haritada Göster'),
+                          const Spacer(),
+                          Icon(
+                            Icons.chevron_right,
+                            size: 40.0,
+                            color: _primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -724,6 +760,12 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
     } else {
       throw Exception('Failed to fetch victim data');
     }
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    var first = placemarks.first;
+    setState(() {
+      address = '${first.name}, ${first.administrativeArea}/${first.subAdministrativeArea}, ${first.street} ${first.postalCode}, ${first.isoCountryCode}';
+    });
   }
 
   Future<void> getRescueFromDB() async {
