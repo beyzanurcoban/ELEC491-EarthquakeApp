@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -67,8 +68,12 @@ class _MapPageState extends State<MapPage> {
             color: Colors.red,
             iconSize: 45.0,
             onPressed: () {
-              // TODO: Long Lat Copy to Device's Clipboard
-              print('Marker pressed');
+              Clipboard.setData(ClipboardData(text: '${widget.lat} ${widget.long}'))
+                  .then((_) { //only if ->
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Lokasyon kopyalandı!'))
+                  ); // ScaffoldMessenger
+              });// -> show a notification
             },
           ),
         ),
