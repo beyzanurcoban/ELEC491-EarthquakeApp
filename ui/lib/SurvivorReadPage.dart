@@ -381,6 +381,8 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
 
     List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
     var first = placemarks.first;
-    address = '${first.name} ${first.locality} ${first.administrativeArea} ${first.street}';
+    setState(() {
+      address = '${first.name}, ${first.administrativeArea}/${first.subAdministrativeArea}, ${first.street} ${first.postalCode}, ${first.isoCountryCode}';
+    });
   }
 }
