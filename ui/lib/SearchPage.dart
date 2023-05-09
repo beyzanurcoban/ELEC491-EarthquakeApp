@@ -257,12 +257,54 @@ class _SearchPageState extends State<SearchPage> {
       _queryResults.clear();
     });
 
+    // TODO: JOIN MASTER TABLES
+    // Search for any occurrences of the search term in master tables
+    // Get IDs of entries where search term matches their name
+    List<String> ids = [];
+
+    if (_selectedTable == 'clinic') {
+      var masterDocRefs = await db.collection('hospital_master').get();
+      var masterDocs = masterDocRefs.docs.where((doc)
+      => doc.data().values.any((value)
+      => value.toString().contains(searchTerm)));
+
+      for (var element in masterDocs) {
+        ids.add(element.id.toString());
+      }
+    }
+
+    if (_selectedTable == 'burial') {
+      var masterDocRefs = await db.collection('cemetery_master').get();
+      var masterDocs = masterDocRefs.docs.where((doc)
+      => doc.data().values.any((value)
+      => value.toString().contains(searchTerm)));
+
+      for (var element in masterDocs) {
+        ids.add(element.id.toString());
+      }
+    }
+
+    if (_selectedTable == 'firstaid') {
+      var masterDocRefs = await db.collection('ambulance_master').get();
+      var masterDocs = masterDocRefs.docs.where((doc)
+      => doc.data().values.any((value)
+      => value.toString().contains(searchTerm)));
+
+      for (var element in masterDocs) {
+        ids.add(element.id.toString());
+      }
+    }
+
+    List<String> searchTerms = [];
+    searchTerms.add(searchTerm);
+    searchTerms.addAll(ids);
+
     for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
       // SEARCH IN ALL RELATED TABLES
       var docRefs = await db.collection(table).get();
-      var docs = docRefs.docs.where((doc) => doc.data().values.any((value) => value.toString().contains(searchTerm)));
-
-      // TODO: JOIN MASTER TABLES
+      var docs = docRefs.docs.where((doc)
+        => doc.data().values.any((value)
+        => value.toString().contains(searchTerm)));
 
 
       // DISPLAY INFO ON BUTTON
