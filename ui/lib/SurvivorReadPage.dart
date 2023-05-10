@@ -15,6 +15,8 @@ class SurvivorReadPage extends StatefulWidget {
 }
 
 class _SurvivorReadPageState extends State<SurvivorReadPage> {
+  final Color _primaryColor = const Color(0xff6a6b83);
+
   // From victim table
   String natID = 'Girilmemiş';
   String name = 'Girilmemiş';
@@ -24,13 +26,13 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   String ageMax = 'Girilmemiş';
   String bloodType = 'Girilmemiş';
   String chronicIllness = 'Girilmemiş';
-  double longitude = 0.0;
-  double latitude = 0.0;
+  String essentialNeeds = 'Girilmemiş';
+  double latestLongitude = 0.0;
+  double latestLatitude = 0.0;
   String address = '';
 
-  final Color _primaryColor = const Color(0xff6a6b83);
-
   // From rescue table
+  bool _rescueRecordExists = false;
   String city = 'Girilmemiş';
   String province = 'Girilmemiş';
   String neighbourhood = 'Girilmemiş';
@@ -39,34 +41,45 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
   String rescueDate = 'Girilmemiş';
 
   // From clinic table
+  bool _clinicRecordExists = false;
   String clinicHospitalName = 'Girilmemiş';
   String clinicEnterDate = 'Girilmemiş';
   String clinicDischargeDate = 'Girilmemiş';
+  String clinicNotes = 'Girilmemiş';
 
   // From er table
+  bool _erRecordExists = false;
   String erHospitalName = 'Girilmemiş';
   String erEnterDate = 'Girilmemiş';
   String erDischargeDate = 'Girilmemiş';
+  String erNotes = 'Girilmemiş';
+
+  // From morgue table
+  bool _morgueRecordExists = false;
+  String morgueHospitalName = 'Girilmemiş';
+  String morgueEnterDate = 'Girilmemiş';
+  String morgueDischargeDate = 'Girilmemiş';
+  String morgueNotes = 'Girilmemiş';
 
   // From firstaid table
+  bool _firstaidRecordExists = false;
   final Map<int, String> _victimConditions = {
     0: 'Hafif Yaralı',
     1: 'Yaralı',
     2: 'Ağır Yaralı',
     3: 'Ölü'
   };
-  String firstaidHospitalName = 'Girilmemiş';
+  String firstaidPlateNumber = 'Girilmemiş';
   String victimCondition = 'Girilmemiş';
   String firstaidAppliedDate = 'Girilmemiş';
+  String firstaidNotes = 'Girilmemiş';
 
-  // From morgue table
-  String morgueHospitalName = 'Girilmemiş';
-  String morgueEnterDate = 'Girilmemiş';
-  String morgueDischargeDate = 'Girilmemiş';
-
-  // From graveyard table
-  String graveyardName = 'Girilmemiş';
+  // From burial table
+  bool _burialRecordExists = false;
+  String cemeteryName = 'Girilmemiş';
+  String graveNumber = 'Girilmemiş';
   String burialDate = 'Girilmemiş';
+  String burialNotes = 'Girilmemiş';
 
   late FirebaseFirestore db;
 
@@ -77,11 +90,8 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
     // Connect to DB
     db = FirebaseFirestore.instance;
 
-    // Get victim info from DB with ndefUID
-    getVictimFromDB();
-    getRescueFromDB();
-    getClinicFromDB();
-    getGraveyardFromDB();
+    // Get victim info from *all* tables in DB with ndefUID
+    fetchData();
   }
 
   @override
@@ -99,264 +109,56 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  const Padding(padding: EdgeInsets.only(top: 20)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '$name $surname',
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 25.0,
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 5)),
-                      Text(
-                        "ndefUID: ${widget.ndefUID}",
-                        style: const TextStyle(
-                          fontSize: 15.0,
-                          color: Colors.black38,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 15)),
-                    ],
-                  ),
                   const Padding(padding: EdgeInsets.only(top: 10)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'TC Kimlik No.',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            natID,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18
-                            ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '$name $surname',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 25.0,
+                                  color: _primaryColor,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const Padding(padding: EdgeInsets.only(top: 5)),
+                              Text(
+                                "Etiket ID: ${widget.ndefUID}",
+                                style: const TextStyle(
+                                  fontSize: 15.0,
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const Padding(padding: EdgeInsets.only(top: 15)),
+                            ],
                           ),
                         ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
-                  const Padding(padding: EdgeInsets.only(top: 5)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Cinsiyet',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            sex,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 5)),
+                  DBFieldWidget(fieldTitle: 'TC Kimlik No.', fieldValue: natID),
+                  DBFieldWidget(fieldTitle: 'Cinsiyet', fieldValue: sex),
                   Row(
                     children: [
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(padding: EdgeInsets.only(top: 10)),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 5),
-                              child: Text(
-                                'Minimum Yaş',
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: Colors.black38,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: Text(
-                                  ageMin,
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: DBFieldWidget(fieldTitle: 'Minimum Yaş', fieldValue: ageMin)
                       ),
-                      const Padding(padding: EdgeInsets.only(left: 10)),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Padding(padding: EdgeInsets.only(top: 10)),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 5),
-                              child: Text(
-                                'Maksimum Yaş',
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: Colors.black38,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: Text(
-                                  ageMax,
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: DBFieldWidget(fieldTitle: 'Maksimum Yaş', fieldValue: ageMax)
                       ),
                     ],
                   ),
-                  const Padding(padding: EdgeInsets.only(top: 5)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Kan Grubu',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            bloodType,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 5)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Kronik Rahatsızlıklar',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            chronicIllness,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 5)),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Son Görülen Konum',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            address,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  const Padding(padding: EdgeInsets.only(top: 5)),
+                  DBFieldWidget(fieldTitle: 'Kan Grubu', fieldValue: bloodType),
+                  DBFieldWidget(fieldTitle: 'Kronik Rahatsızlıklar', fieldValue: chronicIllness),
+                  DBFieldWidget(fieldTitle: 'Temel İhtiyaçlar', fieldValue: essentialNeeds),
+                  DBFieldWidget(fieldTitle: 'Son Görülen Konum', fieldValue: address),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -365,372 +167,125 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     onPressed: () {
                       Navigator.push<String>(
                         context,
-                        MaterialPageRoute(builder: (context) => MapPage(lat: latitude, long: longitude)),
+                        MaterialPageRoute(builder: (context) => MapPage(lat: latestLatitude, long: latestLongitude)),
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(4.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Icon(Icons.map,
-                            size: 40.0,
+                            size: 30.0,
                             color: _primaryColor,
                           ),
-                          const Padding(padding: EdgeInsets.only(left: 10.0)),
+                          const Spacer(),
                           const Text('Konumu Haritada Göster'),
                           const Spacer(),
                           Icon(
                             Icons.chevron_right,
-                            size: 40.0,
+                            size: 30.0,
                             color: _primaryColor,
                           ),
                         ],
                       ),
                     ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Enkazdan Çıkarılma Tarihi',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            rescueDate,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
+                  Visibility(
+                    visible: true,
+                    child: Column(
+                      children: [
+                        const DBTableNameWidget(tableName: 'Arama-Kurtarma'),
+                        DBFieldWidget(fieldTitle: 'Kurtarma Tarihi', fieldValue: rescueDate),
+                        Row(
+                          children: [
+                            Expanded(
+                                child: DBFieldWidget(fieldTitle: 'İl', fieldValue: province)
                             ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'İl',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            city,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
+                            Expanded(
+                                child: DBFieldWidget(fieldTitle: 'İlçe', fieldValue: city)
                             ),
-                          ),
+                          ],
                         ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'İlçe',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            province,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
+                        Row(
+                          children: [
+                            Expanded(
+                                child: DBFieldWidget(fieldTitle: 'Mahalle', fieldValue: neighbourhood)
                             ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Mahalle',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            neighbourhood,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
+                            Expanded(
+                                child: DBFieldWidget(fieldTitle: 'Sokak', fieldValue: street)
                             ),
-                          ),
+                          ],
                         ),
-                      )
-                    ],
+                        DBFieldWidget(fieldTitle: 'Bina', fieldValue: building),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Cadde',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            street,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                  Visibility(
+                    //TODO: set to its visibility boolean
+                    visible: true,
+                    child: Column(
+                      children: [
+                        const DBTableNameWidget(tableName: 'İlk Yardım'),
+                        DBFieldWidget(fieldTitle: 'İlk Yardım Tarihi', fieldValue: firstaidAppliedDate),
+                        DBFieldWidget(fieldTitle: 'Ambulans Plakası', fieldValue: firstaidPlateNumber),
+                        DBFieldWidget(fieldTitle: 'Yaralanma Durumu', fieldValue: victimCondition),
+                        DBFieldWidget(fieldTitle: 'Notlar', fieldValue: firstaidNotes),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Bina Adı',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            building,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                  Visibility(
+                    //TODO: set to its visibility boolean
+                    visible: true,
+                    child: Column(
+                      children: [
+                        const DBTableNameWidget(tableName: 'Acil'),
+                        DBFieldWidget(fieldTitle: 'Hastane', fieldValue: erHospitalName),
+                        DBFieldWidget(fieldTitle: 'Giriş Tarihi', fieldValue: erEnterDate),
+                        DBFieldWidget(fieldTitle: 'Çıkış Tarihi', fieldValue: erDischargeDate),
+                        DBFieldWidget(fieldTitle: 'Notlar', fieldValue: erNotes),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Hastane Adı',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            clinicHospitalName,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                  Visibility(
+                    //TODO: set to its visibility boolean
+                    visible: true,
+                    child: Column(
+                      children: [
+                        const DBTableNameWidget(tableName: 'Klinik'),
+                        DBFieldWidget(fieldTitle: 'Hastane', fieldValue: clinicHospitalName),
+                        DBFieldWidget(fieldTitle: 'Giriş Tarihi', fieldValue: clinicEnterDate),
+                        DBFieldWidget(fieldTitle: 'Çıkış Tarihi', fieldValue: clinicDischargeDate),
+                        DBFieldWidget(fieldTitle: 'Notlar', fieldValue: clinicNotes),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Hastaneye Giriş Tarihi',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            clinicEnterDate,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                  Visibility(
+                    //TODO: set to its visibility boolean
+                    visible: true,
+                    child: Column(
+                      children: [
+                        const DBTableNameWidget(tableName: 'Morg'),
+                        DBFieldWidget(fieldTitle: 'Hastane', fieldValue: morgueHospitalName),
+                        DBFieldWidget(fieldTitle: 'Giriş Tarihi', fieldValue: morgueEnterDate),
+                        DBFieldWidget(fieldTitle: 'Çıkış Tarihi', fieldValue: morgueDischargeDate),
+                        DBFieldWidget(fieldTitle: 'Notlar', fieldValue: morgueNotes),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Hastaneden Çıkış Tarihi',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            clinicDischargeDate,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                  Visibility(
+                    //TODO: set to its visibility boolean
+                    visible: true,
+                    child: Column(
+                      children: [
+                        const DBTableNameWidget(tableName: 'Defin'),
+                        DBFieldWidget(fieldTitle: 'Defin Tarihi', fieldValue: burialDate),
+                        DBFieldWidget(fieldTitle: 'Mezarlık', fieldValue: cemeteryName),
+                        DBFieldWidget(fieldTitle: 'Mezar Numarası', fieldValue: graveNumber),
+                        DBFieldWidget(fieldTitle: 'Notlar', fieldValue: burialNotes),
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Mezarlık Adı',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            graveyardName,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 5),
-                        child: Text(
-                          'Defin Tarihi',
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5.0),
-                          color: Colors.black38,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Text(
-                            burialDate,
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-
                 ],
               ),
             ),
@@ -740,9 +295,10 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
     );
   }
 
-  Future<void> getVictimFromDB() async {
-    final docRef = db.collection('victim').doc(widget.ndefUID);
-    final docSnap = await docRef.get();
+  Future<void> fetchData() async {
+    // VICTIM TABLE
+    var docRef = db.collection('victim').doc(widget.ndefUID);
+    var docSnap = await docRef.get();
 
     if (docSnap.exists) {
       final data = docSnap.data()!;
@@ -755,67 +311,218 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
         ageMax = data['victim_age_max']?.toString() ?? ageMax;
         bloodType = data['blood_type'] ?? bloodType;
         chronicIllness = data['chronic_illness'] ?? chronicIllness;
-        latitude = data['latitude'] ?? latitude;
-        longitude = data['longitude'] ?? longitude;
+        essentialNeeds = data['essential_needs'] ?? essentialNeeds;
+        latestLatitude = data['latest_latitude'] ?? latestLatitude;
+        latestLongitude = data['latest_longitude'] ?? latestLongitude;
       });
-    } else {
-      throw Exception('Failed to fetch victim data');
     }
 
-    List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+    // RESCUE TABLE
+    docRef = db.collection('rescue').doc(widget.ndefUID);
+    docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+      setState(() {
+        _rescueRecordExists = true;
+
+        province = data['province'] ?? province;
+        city = data['city'] ?? city;
+        neighbourhood = data['neighbourhood'] ?? neighbourhood;
+        street = data['street'] ?? street;
+        building = data['building'] ?? building;
+        rescueDate = data['rescue_datetime']?.toDate().toString() ?? rescueDate;
+      });
+    }
+
+    // FIRSTAID
+    docRef = db.collection('firstaid').doc(widget.ndefUID);
+    docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+
+      var docRefMaster = db.collection('ambulance_master').doc(data['pnum']);
+      var docSnapMaster = await docRefMaster.get();
+
+      setState(() {
+        _firstaidRecordExists = true;
+
+        firstaidPlateNumber = docSnapMaster.data()?['plate_number'] ?? firstaidPlateNumber;
+        firstaidAppliedDate = data['applied_datetime']?.toDate().toString() ?? firstaidAppliedDate;
+        victimCondition = _victimConditions[data['victim_condition']] ?? victimCondition;
+        firstaidNotes = data['notes']?.toString() ?? firstaidNotes;
+      });
+    }
+
+    // CLINIC
+    docRef = db.collection('clinic').doc(widget.ndefUID);
+    docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+
+      var docRefMaster = db.collection('hospital_master').doc(data['hospital_id']);
+      var docSnapMaster = await docRefMaster.get();
+
+      setState(() {
+        _clinicRecordExists = true;
+
+        clinicHospitalName = docSnapMaster.data()?['hospital_name'] ?? clinicHospitalName;
+        clinicEnterDate = data['enter_datetime']?.toDate().toString() ?? clinicEnterDate;
+        clinicDischargeDate = data['discharge_datetime']?.toDate().toString() ?? clinicDischargeDate;
+        clinicNotes = data['notes']?.toString() ?? clinicNotes;
+      });
+    }
+
+    // ER
+    docRef = db.collection('er').doc(widget.ndefUID);
+    docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+
+      var docRefMaster = db.collection('hospital_master').doc(data['hospital_id']);
+      var docSnapMaster = await docRefMaster.get();
+
+      setState(() {
+        _erRecordExists = true;
+
+        erHospitalName = docSnapMaster.data()?['hospital_name'] ?? erHospitalName;
+        erEnterDate = data['enter_datetime']?.toDate().toString() ?? erEnterDate;
+        erDischargeDate = data['discharge_datetime']?.toDate().toString() ?? erDischargeDate;
+        erNotes = data['notes']?.toString() ?? erNotes;
+      });
+    }
+
+    // MORGUE
+    docRef = db.collection('morgue').doc(widget.ndefUID);
+    docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+
+      var docRefMaster = db.collection('hospital_master').doc(data['hospital_id']);
+      var docSnapMaster = await docRefMaster.get();
+
+      setState(() {
+        _morgueRecordExists = true;
+
+        morgueHospitalName = docSnapMaster.data()?['hospital_name'] ?? morgueHospitalName;
+        morgueEnterDate = data['enter_datetime']?.toDate().toString() ?? morgueEnterDate;
+        morgueDischargeDate = data['discharge_datetime']?.toDate().toString() ?? morgueDischargeDate;
+        morgueNotes = data['notes']?.toString() ?? morgueNotes;
+      });
+    }
+
+    // BURIAL
+    docRef = db.collection('burial').doc(widget.ndefUID);
+    docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      final data = docSnap.data()!;
+
+      var docRefMaster = db.collection('cemetery_master').doc(data['cemetery_id']);
+      var docSnapMaster = await docRefMaster.get();
+
+      setState(() {
+        _burialRecordExists = true;
+
+        cemeteryName = docSnapMaster.data()?['cemetery_name'] ?? cemeteryName;
+        graveNumber = data['grave_number']?.toString() ?? graveNumber;
+        burialDate = data['burial_datetime']?.toDate().toString() ?? burialDate;
+        burialNotes = data['notes']?.toString() ?? burialNotes;
+      });
+    }
+
+    List<Placemark> placemarks = await placemarkFromCoordinates(latestLatitude, latestLongitude);
     var first = placemarks.first;
     setState(() {
       address = '${first.name}, ${first.administrativeArea}/${first.subAdministrativeArea}, ${first.street} ${first.postalCode}, ${first.isoCountryCode}';
     });
   }
+}
 
-  Future<void> getRescueFromDB() async {
-    final docRef = db.collection('rescue').doc(widget.ndefUID);
-    final docSnap = await docRef.get();
+class DBTableNameWidget extends StatelessWidget {
+  final String tableName;
 
-    if (docSnap.exists) {
-      final data = docSnap.data()!;
-      setState(() {
-        city = data['city'] ?? city;
-        province = data['province'] ?? province;
-        neighbourhood = data['neighbourhood'] ?? neighbourhood;
-        street = data['street'] ?? street;
-        building = data['building'] ?? building;
-        rescueDate = data['rescue_datetime']?.toString() ?? rescueDate;
-      });
-    } else {
-      throw Exception('Failed to fetch rescue data');
-    }
+  const DBTableNameWidget({Key? key, required this.tableName}) : super(key: key);
+
+  final Color _primaryColor = const Color(0xff6a6b83);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(padding: EdgeInsets.only(top: 20.0)),
+            Padding(
+              padding: const EdgeInsets.only(left: 4.0, bottom: 2.0, right: 4.0),
+              child: Text(
+                tableName,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18.0,
+                  color: _primaryColor,
+                ),
+              ),
+            ),
+            Divider(
+              thickness: 2,
+              color: _primaryColor,
+            ),
+          ]
+      )
+    );
   }
+}
 
-  Future<void> getClinicFromDB() async {
-    final docRef = db.collection('clinic').doc(widget.ndefUID);
-    final docSnap = await docRef.get();
+class DBFieldWidget extends StatelessWidget {
 
-    if (docSnap.exists) {
-      final data = docSnap.data()!;
-      setState(() {
-        clinicHospitalName = data['hospital_name'] ?? clinicHospitalName;
-        clinicEnterDate = data['enter_datetime']?.toString() ?? clinicEnterDate;
-        clinicDischargeDate = data['discharge_datetime']?.toString() ?? clinicDischargeDate;
-      });
-    } else {
-      throw Exception('Failed to fetch clinic data');
-    }
-  }
+  final String fieldTitle;
+  final String fieldValue;
 
-  Future<void> getGraveyardFromDB() async {
-    final docRef = db.collection('graveyard').doc(widget.ndefUID);
-    final docSnap = await docRef.get();
+  const DBFieldWidget({Key? key, required this.fieldTitle, required this.fieldValue}) : super(key: key);
 
-    if (docSnap.exists) {
-      final data = docSnap.data()!;
-      setState(() {
-        graveyardName = data['graveyard_name'] ?? clinicHospitalName;
-        burialDate = data['burial_datetime']?.toString() ?? clinicDischargeDate;
-      });
-    } else {
-      throw Exception('Failed to fetch graveyard data');
-    }
+  final Color _primaryColor = const Color(0xff6a6b83);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+                  child: Text(
+                    fieldTitle,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: _primaryColor,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+                  child: Text(
+                    fieldValue,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w300,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
