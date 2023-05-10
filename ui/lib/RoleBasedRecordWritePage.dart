@@ -703,10 +703,10 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       TextFormField(
-                        controller: _notesInputController,
+                        controller: _graveNumberInputController,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: 'Notlar',
+                          labelText: 'Mezarlık Numarası',
                         ),
                       ),
                     ],

@@ -22,6 +22,7 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
   String ageMax = 'Girilmemiş';
   String bloodType = 'Girilmemiş';
   String chronicIllness = 'Girilmemiş';
+  String essentialNeeds = 'Girilmemiş';
   double longitude = 0.0;
   double latitude = 0.0;
 
@@ -33,6 +34,7 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
   final TextEditingController _ageMaxInputController = TextEditingController();
   final TextEditingController _bloodTypeInputController = TextEditingController();
   final TextEditingController _chronicIllnessInputController = TextEditingController();
+  final TextEditingController _essetialNeedsInputController = TextEditingController();
 
   late FirebaseFirestore db;
 
@@ -269,7 +271,6 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TODO: Implement Dropdown here for blood type
                     TextFormField(
                       controller: _chronicIllnessInputController,
                       decoration: const InputDecoration(
@@ -279,6 +280,29 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
                     ),
                     Text(
                       'Veritabanında: $chronicIllness',
+                      textAlign: TextAlign.start,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 30.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextFormField(
+                      controller: _essetialNeedsInputController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Temel İhtiyaçlar'
+                      ),
+                    ),
+                    Text(
+                      'Veritabanında: $essentialNeeds',
                       textAlign: TextAlign.start,
                       style: const TextStyle(
                         color: Colors.black54,
@@ -316,6 +340,7 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
         ageMax = data['victim_age_max']?.toString() ?? ageMax;
         bloodType = data['blood_type'] ?? bloodType;
         chronicIllness = data['chronic_illness'] ?? chronicIllness;
+        essentialNeeds = data['essential_needs'] ?? essentialNeeds;
         latitude = data['latitude'] ?? latitude;
         longitude = data['longitude'] ?? longitude;
       });
@@ -353,10 +378,9 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
       if (_chronicIllnessInputController.text.isNotEmpty) {
         victimData['chronic_illness'] = _chronicIllnessInputController.text;
       }
-
-      // TODO: After implementing location services
-      /*victimData['latitude'] = latitude;
-      victimData['longitude'] = longitude;*/
+      if (_essetialNeedsInputController.text.isNotEmpty) {
+        victimData['essential_needs'] = _essetialNeedsInputController.text;
+      }
 
       final docSnap = await docRef.get();
       if (docSnap.exists) {

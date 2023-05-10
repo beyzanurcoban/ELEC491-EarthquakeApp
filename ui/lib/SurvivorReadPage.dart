@@ -192,7 +192,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     ),
                   ),
                   Visibility(
-                    visible: true,
+                    visible: _rescueRecordExists,
                     child: Column(
                       children: [
                         const DBTableNameWidget(tableName: 'Arama-Kurtarma'),
@@ -222,8 +222,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     ),
                   ),
                   Visibility(
-                    //TODO: set to its visibility boolean
-                    visible: true,
+                    visible: _firstaidRecordExists,
                     child: Column(
                       children: [
                         const DBTableNameWidget(tableName: 'İlk Yardım'),
@@ -235,8 +234,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     ),
                   ),
                   Visibility(
-                    //TODO: set to its visibility boolean
-                    visible: true,
+                    visible: _erRecordExists,
                     child: Column(
                       children: [
                         const DBTableNameWidget(tableName: 'Acil'),
@@ -248,8 +246,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     ),
                   ),
                   Visibility(
-                    //TODO: set to its visibility boolean
-                    visible: true,
+                    visible: _clinicRecordExists,
                     child: Column(
                       children: [
                         const DBTableNameWidget(tableName: 'Klinik'),
@@ -261,8 +258,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     ),
                   ),
                   Visibility(
-                    //TODO: set to its visibility boolean
-                    visible: true,
+                    visible: _morgueRecordExists,
                     child: Column(
                       children: [
                         const DBTableNameWidget(tableName: 'Morg'),
@@ -274,8 +270,7 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                     ),
                   ),
                   Visibility(
-                    //TODO: set to its visibility boolean
-                    visible: true,
+                    visible: _burialRecordExists,
                     child: Column(
                       children: [
                         const DBTableNameWidget(tableName: 'Defin'),
