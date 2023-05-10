@@ -337,13 +337,10 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
     if (docSnap.exists) {
       final data = docSnap.data()!;
 
-      var docRefMaster = db.collection('ambulance_master').doc(data['pnum']);
-      var docSnapMaster = await docRefMaster.get();
-
       setState(() {
         _firstaidRecordExists = true;
 
-        firstaidPlateNumber = docSnapMaster.data()?['plate_number'] ?? firstaidPlateNumber;
+        firstaidPlateNumber = data['plate_number'] ?? firstaidPlateNumber;
         firstaidAppliedDate = data['applied_datetime']?.toDate().toString() ?? firstaidAppliedDate;
         victimCondition = _victimConditions[data['victim_condition']] ?? victimCondition;
         firstaidNotes = data['notes']?.toString() ?? firstaidNotes;
