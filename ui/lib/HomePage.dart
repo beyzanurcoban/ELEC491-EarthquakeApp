@@ -118,7 +118,6 @@ class _HomePageState extends State<HomePage> {
                                       child: SizedBox(
                                         height: 60,
                                         child: ElevatedButton(
-
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: Colors.white,
                                             shape: RoundedRectangleBorder(
@@ -554,8 +553,8 @@ class _HomePageState extends State<HomePage> {
         double lat = position.latitude;
         double long = position.longitude;
 
-        record['latitude'] = lat;
-        record['longitude'] = long;
+        record['latest_latitude'] = lat;
+        record['latest_longitude'] = long;
 
         final docSnap = await docRef.get();
         if (docSnap.exists) {

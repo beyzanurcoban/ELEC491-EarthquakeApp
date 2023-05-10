@@ -262,7 +262,6 @@ class _SearchPageState extends State<SearchPage> {
     // PARSE SEARCH TERMS IN INPUT
     searchTerms.addAll(searchTerm.split(' '));
     searchTerms.remove('');
-    print(searchTerms);
 
     // JOIN MASTER TABLES
     // Search for any occurrences of the search term in master tables
@@ -306,7 +305,6 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     searchTerms.addAll(ids);
-    print(searchTerms);
 
     for (String table in _tableToListOfTables[_selectedTable] ?? ['victim']) {
 
