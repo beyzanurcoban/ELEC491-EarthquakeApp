@@ -306,14 +306,14 @@ class _LoginPageState extends State<LoginPage> {
       _isWaitingAutoLogin = true;
     });
     if (await usernamePasswordExists(username, password)) {
-      setState(() {
-        _isWaitingAutoLogin = false;
-      });
-
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage(username: username,)),
       );
+
+      setState(() {
+        _isWaitingAutoLogin = false;
+      });
     } else {
       setState(() {
         _isWaitingAutoLogin = false;

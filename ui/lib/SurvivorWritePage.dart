@@ -38,6 +38,8 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
 
   late FirebaseFirestore db;
 
+  final Color _primaryColor = const Color(0xff6a6b83);
+
   @override
   void initState() {
     super.initState();
@@ -66,9 +68,9 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
                 padding: const EdgeInsets.only(top: 10.0, bottom: 30.0),
                 child: Text(
                   "ndefUID: ${widget.ndefUID}",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15.0,
-                    color: Colors.black38,
+                    color: _primaryColor,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -313,11 +315,17 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
                 ),
               ),
               ElevatedButton(
-                  onPressed: () {
-                    writeVictimToDB();
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Güncelle')),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  writeVictimToDB();
+                  Navigator.pop(context);
+                },
+                child: const Text('Güncelle')),
             ],
           ),
         ),
