@@ -24,6 +24,7 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchTermInputController = TextEditingController();
 
   List<Map<String, dynamic>> _queryResults = <Map<String, dynamic>>[];
+  List<String> _queryResultIDs = <String>[];
 
   final Map<String, String> _tables = {
     'victim': 'Depremzede Bilgisi',
@@ -255,6 +256,7 @@ class _SearchPageState extends State<SearchPage> {
 
     setState(() {
       _queryResults.clear();
+      _queryResultIDs.clear();
     });
 
     List<String> searchTerms = [];
@@ -322,6 +324,10 @@ class _SearchPageState extends State<SearchPage> {
 
         Map<String, dynamic> completeQuery = {};
 
+        if (_queryResultIDs.contains(ndefUID)) {
+          continue;
+        }
+
         completeQuery['ndefUID'] = ndefUID;
 
         // VICTIM TABLE
@@ -363,9 +369,8 @@ class _SearchPageState extends State<SearchPage> {
         }
 
         setState(() {
-          if (!_queryResults.contains(completeQuery)) {
-            _queryResults.add(completeQuery);
-          }
+          _queryResultIDs.add(completeQuery['ndefUID']);
+          _queryResults.add(completeQuery);
         });
       }
     }
