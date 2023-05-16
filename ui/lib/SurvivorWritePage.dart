@@ -6,8 +6,13 @@ import 'package:flutter/material.dart';
 
 class SurvivorWritePage extends StatefulWidget {
   final String ndefUID;
+  final String userID;
 
-  const SurvivorWritePage({super.key, required this.ndefUID});
+  const SurvivorWritePage({
+    super.key,
+    required this.ndefUID,
+    required this.userID,
+  });
 
   @override
   _SurvivorWritePageState createState() => _SurvivorWritePageState();
@@ -396,6 +401,16 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
       } else {
         await docRef.set(victimData);
       }
+
+      // ADD TO ACTIVITY LOG
+      CollectionReference logCol = db.collection('activity_log');
+
+      await logCol.add({
+        'date': DateTime.now(),
+        'userID': widget.userID,
+        'table_name': 'victim',
+        'ndefUID': widget.ndefUID,
+      });
 
     } catch (e) {
       throw Exception('Failed to update victim data');

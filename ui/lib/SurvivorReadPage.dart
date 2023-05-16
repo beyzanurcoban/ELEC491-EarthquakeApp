@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 
+import 'package:ui/ActivityLogPage.dart';
 import 'MapPage.dart';
 
 class SurvivorReadPage extends StatefulWidget {
@@ -181,6 +182,39 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
                           ),
                           const Spacer(),
                           const Text('Konumu Haritada Göster'),
+                          const Spacer(),
+                          Icon(
+                            Icons.chevron_right,
+                            size: 30.0,
+                            color: _primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const DBTableNameWidget(tableName: 'Kayıt Tarihçesi'),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: _primaryColor,
+                    ),
+                    onPressed: () {
+                      Navigator.push<String>(
+                        context,
+                        MaterialPageRoute(builder: (context) => ActivityLogPage(ndefUID: widget.ndefUID,)),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Icon(Icons.history,
+                            size: 30.0,
+                            color: _primaryColor,
+                          ),
+                          const Spacer(),
+                          const Text('Tarihçeyi Gör'),
                           const Spacer(),
                           Icon(
                             Icons.chevron_right,

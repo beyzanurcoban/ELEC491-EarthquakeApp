@@ -945,6 +945,16 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
         await docRef.set(record);
       }
 
+      // ADD TO ACTIVITY LOG
+      CollectionReference logCol = db.collection('activity_log');
+
+      await logCol.add({
+        'date': DateTime.now(),
+        'userID': widget.username,
+        'table_name': widget.role,
+        'ndefUID': widget.ndefUID,
+      });
+
     } catch (e) {
       throw Exception('Failed to update record');
     }
