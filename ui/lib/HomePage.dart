@@ -29,14 +29,12 @@ class _HomePageState extends State<HomePage> {
   final Color _primaryColor = const Color(0xff6a6b83);
 
   final Map<String, String> _roles = {
-    'clinic': 'Hastane',
+    'clinic': 'Klinik',
     'er': 'Acil',
     'firstaid': 'İlk Yardım',
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma',
-    'ambulance': 'Ambulans',
     'burial': 'Mezarlık-Defin',
-    'none': 'Yok'
   };
 
   late String _userRole = 'none';
@@ -392,7 +390,7 @@ class _HomePageState extends State<HomePage> {
         // Fetch from database with UID
         Navigator.push<String>(
           context,
-          MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID,)),
+          MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID, userID: widget.username,)),
         );
       });
 
