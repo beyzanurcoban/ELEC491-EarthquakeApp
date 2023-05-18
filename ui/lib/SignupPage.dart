@@ -26,6 +26,7 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _usernameInputController = TextEditingController();
   final TextEditingController _passwordInputController = TextEditingController();
   final TextEditingController _passwordRepeatInputController = TextEditingController();
+  final TextEditingController _authTokenInputController = TextEditingController();
 
   final Map<String, String> _roles = {
     'clinic': 'Hastane',
@@ -33,6 +34,16 @@ class _SignupPageState extends State<SignupPage> {
     'firstaid': 'İlk Yardım',
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma',
+    'burial': 'Mezarlık-Defin',
+  };
+
+  final Map<String, List<String>> _tokens = {
+    'clinic': ['9xtnU6jp', 'yjTo8XjG', 'Ze5w3557'],
+    'er': ['6wZKp1vx', 'BBryTm7s', 'kcmQFpAj'],
+    'firstaid': ['Rvwg3Mob', 'cb2S0otA', 'mcjwPThG'],
+    'morgue': ['4Lhitzqp', '4rxr5rON', 'Kyjco87o'],
+    'rescue': ['87hQ1r71', 's5RoVjfu', 'avt4EHYi'],
+    'burial': ['imkW9nR0', 'K2zLdGvG', 'FKApE2Pm'],
   };
 
   String _selectedRole = 'clinic';
@@ -52,10 +63,8 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Home Page UI Here
     return Scaffold(
         appBar: const CupertinoNavigationBar(
-          leading: CupertinoNavigationBarBackButton(),
           middle: Text(
             "Kayıt Ol",
           ),
@@ -158,6 +167,18 @@ class _SignupPageState extends State<SignupPage> {
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 20),
+                                  child: TextFormField(
+                                    controller: _authTokenInputController,
+                                    enableSuggestions: false,
+                                    autocorrect: false,
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      labelText: 'Yetkilendirme şifrenizi girin.',
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 20),
                                   child: ElevatedButton(
                                     onPressed: () async {
                                       String usernameInput = _usernameInputController.text;
@@ -246,6 +267,14 @@ class _SignupPageState extends State<SignupPage> {
     String password = _passwordInputController.text;
     String passwordRepeat = _passwordRepeatInputController.text;
     if (password != passwordRepeat) {
+      errorMessage = 'Şifre tekrarı uyuşmuyor.';
+      return false;
+    }
+
+    // Check if authorization token is valid
+    bool _tokenValid = _tokens[_selectedRole]?.contains(_authTokenInputController.text) ?? false;
+    if (!_tokenValid) {
+      errorMessage = 'Yetkilendirme şifresi yanlış';
       return false;
     }
 
@@ -253,7 +282,7 @@ class _SignupPageState extends State<SignupPage> {
     CollectionReference usersRef = FirebaseFirestore.instance.collection('user');
     DocumentSnapshot userDoc = await usersRef.doc(_usernameInputController.text).get();
     if (userDoc.exists) {
-      errorMessage = 'Kullanıcı Adı alınmış';
+      errorMessage = 'Kullanıcı adı alınmış';
       return false;
     }
 
