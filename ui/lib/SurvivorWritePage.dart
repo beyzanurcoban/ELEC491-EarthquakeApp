@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,16 +32,20 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
   final TextEditingController _natIDInputController = TextEditingController();
   final TextEditingController _nameInputController = TextEditingController();
   final TextEditingController _surnameInputController = TextEditingController();
-  final TextEditingController _sexInputController = TextEditingController();
   final TextEditingController _ageMinInputController = TextEditingController();
   final TextEditingController _ageMaxInputController = TextEditingController();
-  final TextEditingController _bloodTypeInputController = TextEditingController();
   final TextEditingController _chronicIllnessInputController = TextEditingController();
   final TextEditingController _essetialNeedsInputController = TextEditingController();
 
   late FirebaseFirestore db;
 
   final Color _primaryColor = const Color(0xff6a6b83);
+
+  final List<String> _bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'];
+  final List<String> _sex = ['Kadın', 'Erkek'];
+
+  String _selectedBloodType = 'A+';
+  String _selectedSex = 'Kadın';
 
   @override
   void initState() {
@@ -81,90 +83,90 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text(
+                      'TC Kimlik No',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     TextFormField(
                       controller: _natIDInputController,
                       keyboardType: TextInputType.number,
                       maxLength: 11,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'TC Kimlik No.'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $natID',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText: natID
                       ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text(
+                      'İsim',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     TextFormField(
                       controller: _nameInputController,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'İsim'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $name',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: name
                       ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text(
+                      'Soyisim',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     TextFormField(
                       controller: _surnameInputController,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Soyisim'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $surname',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: surname
                       ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TODO: Reserved for Dropdown Sex Selector
-                    /*Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
                           'Cinsiyet'
                         ),
                         DropdownButton(
-                          items: <String>['Kadın', 'Erkek']
+                          value: _selectedSex,
+                          items: _sex
                               .map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
@@ -174,146 +176,138 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
                           onChanged: (String? value) {
                             // This is called when the user selects an item.
                             setState(() {
-                              sex = value!;
+                              _selectedSex = value!;
                             });
                           },
                         ),
                       ],
-                    ),*/
-                    TextFormField(
-                      controller: _sexInputController,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Cinsiyet'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $sex',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                      ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text(
+                      'Minimum Yaş',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     TextFormField(
                       controller: _ageMinInputController,
                       keyboardType: TextInputType.number,
                       maxLength: 3,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Minimum Yaş'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $ageMin',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: ageMin
                       ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text(
+                      'Maksimum Yaş',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     TextFormField(
                       controller: _ageMaxInputController,
                       keyboardType: TextInputType.number,
                       maxLength: 3,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Maksimum Yaş'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $ageMax',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: ageMax
                       ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TODO: Implement Dropdown here for blood type
-                    TextFormField(
-                      controller: _bloodTypeInputController,
-                      maxLength: 3,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Kan Grubu'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $bloodType',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                            'Kan Grubu'
+                        ),
+                        DropdownButton(
+                          value: _selectedBloodType,
+                          items: _bloodTypes
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (String? value) {
+                            // This is called when the user selects an item.
+                            setState(() {
+                              _selectedBloodType = value!;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text(
+                      'Kronik Rahatsızlıklar',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     TextFormField(
                       controller: _chronicIllnessInputController,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Kronik Rahatsızlıklar'
-                      ),
-                    ),
-                    Text(
-                      'Veritabanında: $chronicIllness',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: chronicIllness
                       ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30.0),
+                padding: const EdgeInsets.only(bottom: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextFormField(
-                      controller: _essetialNeedsInputController,
-                      decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Temel İhtiyaçlar'
+                    const Text(
+                      'Temel İhtiyaçlar',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    Text(
-                      'Veritabanında: $essentialNeeds',
-                      textAlign: TextAlign.start,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontWeight: FontWeight.w500,
+                    TextFormField(
+                      controller: _essetialNeedsInputController,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: essentialNeeds
                       ),
                     ),
                   ],
@@ -356,6 +350,14 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
         essentialNeeds = data['essential_needs'] ?? essentialNeeds;
         latitude = data['latitude'] ?? latitude;
         longitude = data['longitude'] ?? longitude;
+
+        if(sex != 'Girilmemiş'){
+          _selectedSex = sex;
+        }
+
+        if(bloodType != 'Girilmemiş'){
+          _selectedBloodType = bloodType;
+        }
       });
     } else {
       throw Exception('Failed to fetch victim data');
@@ -376,8 +378,8 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
       if (_surnameInputController.text.isNotEmpty) {
         victimData['victim_surname'] = _surnameInputController.text;
       }
-      if (_sexInputController.text.isNotEmpty) {
-        victimData['victim_sex'] = _sexInputController.text;
+      if (_selectedSex.isNotEmpty) {
+        victimData['victim_sex'] = _selectedSex;
       }
       if (_ageMinInputController.text.isNotEmpty) {
         victimData['victim_age_min'] = int.tryParse(_ageMinInputController.text);
@@ -385,8 +387,8 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
       if (_ageMaxInputController.text.isNotEmpty) {
         victimData['victim_age_max'] = int.tryParse(_ageMaxInputController.text);
       }
-      if (_bloodTypeInputController.text.isNotEmpty) {
-        victimData['blood_type'] = _bloodTypeInputController.text;
+      if (_selectedBloodType.isNotEmpty) {
+        victimData['blood_type'] = _selectedBloodType;
       }
       if (_chronicIllnessInputController.text.isNotEmpty) {
         victimData['chronic_illness'] = _chronicIllnessInputController.text;
