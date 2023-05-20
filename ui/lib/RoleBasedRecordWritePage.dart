@@ -612,11 +612,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'İl',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       TextFormField(
                         controller: _provinceInputController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'İl',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: province,
                         ),
                       ),
                     ],
@@ -630,11 +638,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'İlçe',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       TextFormField(
                         controller: _cityInputController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'İlçe',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: city,
                         ),
                       ),
                     ],
@@ -648,11 +664,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'Mahalle',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       TextFormField(
                         controller: _neighbourhoodInputController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Mahalle',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: neighbourhood,
                         ),
                       ),
                     ],
@@ -666,11 +690,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'Sokak',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       TextFormField(
                         controller: _streetInputController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Sokak',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: street,
                         ),
                       ),
                     ],
@@ -684,11 +716,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'Bina',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       TextFormField(
                         controller: _buildingInputController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Bina',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: building,
                         ),
                       ),
                     ],
@@ -702,11 +742,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'Mezarlık Numarası',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       TextFormField(
                         controller: _graveNumberInputController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Mezarlık Numarası',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: graveNumber,
                         ),
                       ),
                     ],
@@ -720,11 +768,19 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Text(
+                        'Notlar',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       TextFormField(
                         controller: _notesInputController,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'Notlar',
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: notes,
                         ),
                       ),
                     ],
@@ -820,32 +876,26 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
         graveNumber = data.containsKey('grave_number') && data['grave_number'] != null
             ? data['grave_number'].toString()
             : graveNumber;
-        _graveNumberInputController.text = graveNumber;
 
         city = data.containsKey('city') && data['city'] != null
             ? data['city'].toString()
             : city;
-        _cityInputController.text = city;
 
         province = data.containsKey('province') && data['province'] != null
             ? data['province'].toString()
             : province;
-        _provinceInputController.text = province;
 
         neighbourhood = data.containsKey('neighbourhood') && data['neighbourhood'] != null
             ? data['neighbourhood'].toString()
             : neighbourhood;
-        _neighbourhoodInputController.text = neighbourhood;
 
         street = data.containsKey('street') && data['street'] != null
             ? data['street'].toString()
             : street;
-        _streetInputController.text = street;
 
         building = data.containsKey('building') && data['building'] != null
             ? data['building'].toString()
             : building;
-        _buildingInputController.text = building;
 
         _selectedHospitalID = data.containsKey('hospital_id') && data['hospital_id'] != null
             ? data['hospital_id'].toString()
@@ -862,7 +912,6 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
         notes = data.containsKey('notes') && data['notes'] != null
             ? data['notes'].toString()
             : notes;
-        _notesInputController.text = notes;
       });
     } else {
       throw Exception('No ${widget.role} record found for this victim');
