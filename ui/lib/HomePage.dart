@@ -325,19 +325,35 @@ class _HomePageState extends State<HomePage> {
     });
 
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
-
       // Get ndefUID from NFC tag
       var ndefUID = tag.data["ndef"]["identifier"]
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      if (await victimExists(ndefUID)) {
+      final timeoutDurationRead = Duration(seconds: 5);
+      final timeoutFutureRead = Future.delayed(timeoutDurationRead);
+
+      final victimExistsFuture = victimExists(ndefUID);
+
+      try {
+        // Wait for either the victimExists to complete or the timeout to occur
+        await Future.any([victimExistsFuture, timeoutFutureRead]);
+
         setState(() {
           _dialogText = 'Profil yükleniyor...';
         });
 
+        // Start the timeout timer
+        final timeoutDuration = Duration(seconds: 5);
+        final timeoutFuture = Future.delayed(timeoutDuration);
+
         // Write last active location of the NFC tag to database
-        writeLocationToDB(ndefUID).then((_) {
+        final writeLocationFuture = writeLocationToDB(ndefUID);
+
+        try {
+          // Wait for either the writeLocationToDB to complete or the timeout to occur
+          await Future.any([writeLocationFuture, timeoutFuture]);
+
           setState(() {
             _nfcSessionRunning = false;
             _dialogText = 'Etiket aranıyor...';
@@ -348,9 +364,23 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
           );
-        });
+        } catch (error) {
+          print('Error: $error');
 
-      } else {
+          setState(() {
+            _nfcSessionRunning = false;
+            _dialogText = 'Etiket aranıyor...';
+          });
+
+          // Access database with Unique ID => ndefUID
+          Navigator.push<String>(
+            context,
+            MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: ndefUID,)),
+          );
+        }
+      } catch (error) {
+        print('Error: $error');
+
         setState(() {
           _nfcSessionRunning = false;
           _dialogText = 'Etiket aranıyor...';
@@ -363,6 +393,7 @@ class _HomePageState extends State<HomePage> {
       NfcManager.instance.stopSession();
     });
   }
+
 
   void _ndefWrite() {
     setState(() {
@@ -380,8 +411,17 @@ class _HomePageState extends State<HomePage> {
         _dialogText = 'Profil yükleniyor...';
       });
 
+      // Start the timeout timer
+      final timeoutDuration = Duration(seconds: 5);
+      final timeoutFuture = Future.delayed(timeoutDuration);
+
       // Write last active location of the NFC tag to database
-      writeLocationToDB(ndefUID).then((_) {
+      final writeLocationFuture = writeLocationToDB(ndefUID);
+
+      try {
+        // Wait for either the writeLocationToDB to complete or the timeout to occur
+        await Future.any([writeLocationFuture, timeoutFuture]);
+
         setState(() {
           _nfcSessionRunning = false;
           _dialogText = 'Etiket aranıyor...';
@@ -392,7 +432,20 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID, userID: widget.username,)),
         );
-      });
+      } catch (error) {
+        print('Error: $error');
+
+        setState(() {
+          _nfcSessionRunning = false;
+          _dialogText = 'Etiket aranıyor...';
+        });
+
+        // Fetch from database with UID
+        Navigator.push<String>(
+          context,
+          MaterialPageRoute(builder: (context) => SurvivorWritePage(ndefUID: ndefUID, userID: widget.username,)),
+        );
+      }
 
       NfcManager.instance.stopSession();
     });
@@ -409,13 +462,30 @@ class _HomePageState extends State<HomePage> {
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join('');
 
-      if(await victimExists(ndefUID)) {
+      final timeoutDurationRead = Duration(seconds: 5);
+      final timeoutFutureRead = Future.delayed(timeoutDurationRead);
+
+      final victimExistsFuture = victimExists(ndefUID);
+
+      try {
+        // Wait for either the victimExists to complete or the timeout to occur
+        await Future.any([victimExistsFuture, timeoutFutureRead]);
+
         setState(() {
           _dialogText = 'Profil yükleniyor...';
         });
 
+        // Start the timeout timer
+        final timeoutDuration = Duration(seconds: 5);
+        final timeoutFuture = Future.delayed(timeoutDuration);
+
         // Write last active location of the NFC tag to database
-        writeLocationToDB(ndefUID).then((_) {
+        final writeLocationFuture = writeLocationToDB(ndefUID);
+
+        try {
+          // Wait for either the writeLocationToDB to complete or the timeout to occur
+          await Future.any([writeLocationFuture, timeoutFuture]);
+
           setState(() {
             _nfcSessionRunning = false;
             _dialogText = 'Etiket aranıyor...';
@@ -430,9 +500,27 @@ class _HomePageState extends State<HomePage> {
               role: _userRole,
             )),
           );
-        });
+        } catch (error) {
+          print('Error: $error');
 
-      } else {
+          setState(() {
+            _nfcSessionRunning = false;
+            _dialogText = 'Etiket aranıyor...';
+          });
+
+          // Fetch from database with UID
+          Navigator.push<String>(
+            context,
+            MaterialPageRoute(builder: (context) => RoleBasedRecordWritePage(
+              ndefUID: ndefUID,
+              username: widget.username,
+              role: _userRole,
+            )),
+          );
+        }
+      } catch (error) {
+        print('Error: $error');
+
         setState(() {
           _nfcSessionRunning = false;
           _dialogText = 'Etiket aranıyor...';
