@@ -16,13 +16,18 @@ Future<void> main() async {
 class NFCTrackerApp extends StatelessWidget {
   const NFCTrackerApp({super.key});
 
+  final Color _backgroundColor = const Color(0xffd5d5e4);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'NFC Tracker',
-      home: LoginPage(),
+      home: const LoginPage(),
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: _backgroundColor,
+      ),
     );
   }
 }

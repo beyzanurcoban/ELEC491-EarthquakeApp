@@ -19,6 +19,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final Color _primaryColor = const Color(0xff6a6b83);
+  final Color _secondaryColor = const Color(0xff77789a);
+  final Color _tertiaryColor = const Color(0xffebebeb);
+  final Color _backgroundColor = const Color(0xffd5d5e4);
+  final Color _shadowColor = const Color(0x806a6b83);
+
   bool _passwordObscured = true;
   bool _showError = false;
   bool _isLoading = false;
@@ -58,11 +64,7 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: Home Page UI Here
     return MaterialApp(
       home: Scaffold(
-        appBar: const CupertinoNavigationBar(
-          middle: Text(
-            "Giriş Yap",
-          ),
-        ),
+        backgroundColor: _backgroundColor,
         body: Stack(
           children: [
             Visibility(
@@ -74,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                     builder: (context, ss) => /*ss.data != true
                         ? Center(child: Text('NFC is available: ${ss.data}'))
                         :*/ Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(20.0),
                           child: Stack(
                             children: [
                               Column(
@@ -82,170 +84,300 @@ class _LoginPageState extends State<LoginPage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 80, right: 80, bottom: 16),
-                                    child: Image.asset('assets/images/dost_logo.png'),
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: SizedBox(
+                                      height: 60,
+                                      child: Image.asset('assets/images/dost_large.png'),
+                                    ),
                                   ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 10),
-                                        child: TextFormField(
-                                          controller: _usernameInputController,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]'))
-                                          ],
-                                          decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            labelText: 'Kullanıcı Adı',
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 20),
-                                        child: TextFormField(
-                                          controller: _passwordInputController,
-                                          obscureText: _passwordObscured,
-                                          enableSuggestions: false,
-                                          autocorrect: false,
-                                          decoration: InputDecoration(
-                                            border: const OutlineInputBorder(),
-                                            labelText: 'Şifre',
-                                            suffixIcon: IconButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  _passwordObscured = !_passwordObscured;
-                                                });
-                                              },
-                                              icon: Icon(
-                                                _passwordObscured
-                                                ? Icons.visibility : Icons.visibility_off
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 20),
-                                        child: ElevatedButton(
-                                          onPressed: () async {
-                                            String usernameInput = _usernameInputController.text;
-                                            String passwordInput = _passwordInputController.text;
-                                            if (await usernamePasswordExists(usernameInput, passwordInput)) {
-                                              // Store login credentials (for auto-login)
-                                              await _storeCredentials(usernameInput, passwordInput);
-
-                                              // Go to Home Page (with username)
-                                              Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(builder: (context) => HomePage(username: usernameInput,)),
-                                              );
-                                            } else {
-                                              setState(() {
-                                                _showError = true;
-                                                _isLoading = false;
-                                              });
-                                            }
-                                          },
-                                          child: const Text('Giriş Yap')
-                                        ),
-                                      ),
-                                      Visibility(
-                                        visible: _showError,
-                                        child: const Text(
-                                          'Kullanıcı Adı ya da Şifre yanlış.',
-                                          style: TextStyle(
-                                            color: Colors.redAccent,
-                                            fontSize: 12.0,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 10.0),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            const Text(
-                                              'Profilin yok mu?',
-                                              style: TextStyle(
-                                                color: Colors.black38,
-                                              ),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                // Go to Sign-up Page
-                                                Navigator.push<String>(
-                                                  context,
-                                                  MaterialPageRoute(builder: (context) => const SignupPage()),
-                                                );
-                                              },
-                                              child: const Text(
-                                                'Kayıt ol.',
-                                                style: TextStyle(
-                                                    color: Colors.blueAccent
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 10.0),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            TextButton(
-                                              onPressed: () {
-                                                // Go to Sign-up Page
-                                                Navigator.push<String>(
-                                                  context,
-                                                  MaterialPageRoute(builder: (context) => const HomePage(username: 'readonly',)),
-                                                );
-                                              },
-                                              child: const Text(
-                                                'Giriş yapmadan devam et.',
-                                                style: TextStyle(
-                                                    color: Colors.blueAccent
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Center(
-                                    child: Visibility(
-                                      visible: _isLoading,
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: SizedBox(
+                                      height: 90,
                                       child: Container(
                                         decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(10.0),
-                                            color: Colors.white,
-                                            boxShadow: const [
-                                              BoxShadow(
-                                                color: Colors.black26,
-                                                spreadRadius: 3,
-                                                blurRadius: 5,
-                                                offset: Offset(0, 3),
-                                              )
-                                            ]
+                                          color: _tertiaryColor,
+                                          borderRadius: BorderRadius.circular(30.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _shadowColor,
+                                              blurRadius: 10.0,
+                                              offset: const Offset(0.0, 10.0),
+                                            )
+                                          ],
                                         ),
                                         child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
+                                          padding: const EdgeInsets.only(left: 30.0, right: 30.0),
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: const [
-                                              CircularProgressIndicator(),
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Kullanıcı Adı',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: _primaryColor,
+                                                ),
+                                              ),
+                                              const Padding(padding: EdgeInsets.only(top: 12.0)),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.account_circle_rounded,
+                                                    size: 20.0,
+                                                    color: _primaryColor,
+                                                  ),
+                                                  const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                                  Expanded(
+                                                    child: SizedBox(
+                                                      height: 20.0,
+                                                      child: TextFormField(
+                                                        cursorColor: _primaryColor,
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: _primaryColor,
+                                                        ),
+                                                        controller: _usernameInputController,
+                                                        inputFormatters: <TextInputFormatter>[
+                                                          FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]'))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
                                             ],
                                           ),
                                         ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: SizedBox(
+                                      height: 90,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: _tertiaryColor,
+                                          borderRadius: BorderRadius.circular(30.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _shadowColor,
+                                              blurRadius: 10.0,
+                                              offset: const Offset(0.0, 10.0),
+                                            )
+                                          ],
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'Şifre',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: _primaryColor,
+                                                ),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.key,
+                                                    size: 20.0,
+                                                    color: _primaryColor,
+                                                  ),
+                                                  const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                                  Expanded(
+                                                    child: SizedBox(
+                                                      height: 20.0,
+                                                      child: TextFormField(
+                                                        cursorColor: _primaryColor,
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          color: _primaryColor,
+                                                        ),
+                                                        controller: _passwordInputController,
+                                                        obscureText: _passwordObscured,
+                                                        obscuringCharacter: '●',
+                                                        enableSuggestions: false,
+                                                        autocorrect: false,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 32.0,
+                                                    height: 32.0,
+                                                    child: IconButton(
+                                                      iconSize: 20.0,
+                                                      color: _primaryColor,
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _passwordObscured = !_passwordObscured;
+                                                        });
+                                                      },
+                                                      icon: Icon(
+                                                          _passwordObscured
+                                                              ? Icons.visibility_off : Icons.visibility
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: SizedBox(
+                                      height: 60,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: _tertiaryColor,
+                                          borderRadius: BorderRadius.circular(30.0),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: _shadowColor,
+                                              blurRadius: 10.0,
+                                              offset: const Offset(0.0, 10.0),
+                                            )
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                child: TextButton(
+                                                  onPressed: () {
+                                                    // Go to Sign-up Page
+                                                    Navigator.push<String>(
+                                                      context,
+                                                      MaterialPageRoute(builder: (context) => const SignupPage()),
+                                                    );
+                                                  },
+                                                  child: Text(
+                                                    'Kayıt Ol',
+                                                    style: TextStyle(
+                                                      color: _primaryColor,
+                                                      fontSize: 16.0,
+                                                      fontWeight: FontWeight.w700
+                                                    ),
+                                                  ),
+                                                )
+                                            ),
+                                            Expanded(
+                                                child: SizedBox(
+                                                  height: 60,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: _primaryColor,
+                                                      borderRadius: BorderRadius.circular(30.0),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: _shadowColor,
+                                                          blurRadius: 10.0,
+                                                          offset: const Offset(0.0, 10.0),
+                                                        )
+                                                      ],
+                                                    ),
+                                                    child: TextButton(
+                                                      onPressed: () async {
+                                                        String usernameInput = _usernameInputController.text;
+                                                        String passwordInput = _passwordInputController.text;
+                                                        if (await usernamePasswordExists(usernameInput, passwordInput)) {
+                                                          // Store login credentials (for auto-login)
+                                                          await _storeCredentials(usernameInput, passwordInput);
+                                                          // Go to Home Page (with username)
+                                                          Navigator.pushReplacement(
+                                                            context,
+                                                            MaterialPageRoute(builder: (context) => HomePage(username: usernameInput,)),
+                                                          );
+                                                        } else {
+                                                          setState(() {
+                                                            _showError = true;
+                                                            _isLoading = false;
+                                                          });
+                                                        }
+                                                      },
+                                                      child: Stack(
+                                                        children: [
+                                                          Visibility(
+                                                            visible: !_isLoading,
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Giriş Yap',
+                                                                style: TextStyle(
+                                                                    color: _tertiaryColor,
+                                                                    fontSize: 16.0,
+                                                                    fontWeight: FontWeight.w700
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Visibility(
+                                                            visible: _isLoading,
+                                                            child: Center(
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                                                child: LinearProgressIndicator(
+                                                                  color: _tertiaryColor,
+                                                                  backgroundColor: _primaryColor,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                            )
+                                          ],
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 40),
+                                    child: SizedBox(
+                                      height: 60,
+                                      child: Container(
+                                          decoration: BoxDecoration(
+                                            color: _tertiaryColor,
+                                            borderRadius: BorderRadius.circular(30.0),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: _shadowColor,
+                                                blurRadius: 10.0,
+                                                offset: const Offset(0.0, 10.0),
+                                              )
+                                            ],
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                  child: TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pushReplacement(
+                                                        context,
+                                                        MaterialPageRoute(builder: (context) => const HomePage(username: 'readonly',)),
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      'Giriş Yapmadan Devam Et',
+                                                      style: TextStyle(
+                                                          color: _primaryColor,
+                                                          fontSize: 16.0,
+                                                          fontWeight: FontWeight.w700
+                                                      ),
+                                                    ),
+                                                  )
+                                              ),
+                                            ],
+                                          )
                                       ),
                                     ),
                                   ),
@@ -263,7 +395,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(60.0),
-                  child: Image.asset('assets/images/dost_logo.png'),
+                  child: Image.asset('assets/images/dost_large.png'),
                 ),
               ),
             )

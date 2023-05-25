@@ -21,12 +21,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Color _primaryColor = const Color(0xff6a6b83);
+  final Color _secondaryColor = const Color(0xff77789a);
+  final Color _tertiaryColor = const Color(0xffebebeb);
+  final Color _backgroundColor = const Color(0xffd5d5e4);
+  final Color _shadowColor = const Color(0x806a6b83);
+
   bool _nfcSessionRunning = false;
   bool _roleExists = false;
   bool _canWriteVictim = false;
   String _dialogText = 'Etiket aranıyor...';
-
-  final Color _primaryColor = const Color(0xff6a6b83);
 
   final Map<String, String> _roles = {
     'clinic': 'Klinik',
@@ -35,9 +39,28 @@ class _HomePageState extends State<HomePage> {
     'morgue': 'Morg',
     'rescue': 'Arama-Kurtarma',
     'burial': 'Mezarlık-Defin',
+    'readonly': 'Ekip Yok',
   };
 
-  late String _userRole = 'none';
+  final Map<String, String> _roleToAvatar = {
+    'clinic': 'assets/images/hospital-avatar.png',
+    'er': 'assets/images/hospital-avatar.png',
+    'firstaid': 'assets/images/hospital-avatar.png',
+    'morgue': 'assets/images/hospital-avatar.png',
+    'rescue': 'assets/images/rescue-avatar.png',
+    'burial': 'assets/images/burial-avatar.png',
+  };
+
+  final Map<String, String> _roleToIcon = {
+    'clinic': 'assets/images/crescent32.png',
+    'er': 'assets/images/crescent32.png',
+    'firstaid': 'assets/images/crescent32.png',
+    'morgue': 'assets/images/crescent32.png',
+    'rescue': 'assets/images/hardhat32.png',
+    'burial': 'assets/images/grave32.png',
+  };
+
+  late String _userRole = 'readonly';
 
   final _storage = FlutterSecureStorage();
 
@@ -58,168 +81,271 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     // TODO: Home Page UI Here
     return Scaffold(
-        appBar: CupertinoNavigationBar(
-          middle: const Text(
-            "ELEC491 NFC Takip",
-          ),
-          automaticallyImplyLeading: false,
-          trailing: CupertinoButton(
-            onPressed: () {
-              Navigator.push<String>(
-                context,
-                MaterialPageRoute(builder: (context) => const SearchPage()),
-              );
-            },
-            child: const Icon(
-              CupertinoIcons.search,
-              color: Colors.blue,
-            ),
-          ),
-        ),
+        backgroundColor: _backgroundColor,
         body: SafeArea(
           child: FutureBuilder<bool>(
             future: NfcManager.instance.isAvailable(),
             builder: (context, ss) => /*ss.data != true
                 ? Center(child: Text('NFC is available: ${ss.data}'))
-                :*/ Stack(
-                  children: [
-                    SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                :*/ Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Stack(
+                    children: [
+                      Stack(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 30, left: 80, right: 80, bottom: 16),
-                            child: Image.asset('assets/images/dost_logo.png'),
-                          ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Text(
-                                  'Kullanıcı: ${widget.username}\nYetki: ${_roles[_userRole]}',
-                                  overflow: TextOverflow.ellipsis,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 15.0,
-                                    color: Colors.black38,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
-                                      child: SizedBox(
-                                        height: 60,
-                                        child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                          onPressed: !_nfcSessionRunning ? _tagRead : null,
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Icon(
-                                                Icons.nfc_rounded,
-                                                color: _primaryColor,
-                                              ),
-                                              Text(
-                                                'NFC Etiket Oku',
-                                                style: TextStyle(
-                                                  color: _primaryColor,
-                                                  fontSize: 18.0,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                  TextButton(
+                                      onPressed: !_nfcSessionRunning ? () async {
+                                        _deleteCredentials();
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => const LoginPage()),
+                                        );
+                                      } : null,
+                                      child: Text(
+                                        'Çıkış Yap',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: _primaryColor,
                                         ),
-                                      ),
-                                    ),
+                                      )
                                   ),
                                 ],
                               ),
-                              Visibility(
-                                visible: _canWriteVictim,
-                                child: Row(
-                                  children: [
-                                    Expanded(
+                            ],
+                          ),
+                          SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: SizedBox(
+                                    height: 60,
+                                    child: Image.asset('assets/images/dost_large.png'),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: SizedBox(
+                                    height: 120,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: _tertiaryColor,
+                                        borderRadius: BorderRadius.circular(30.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: _shadowColor,
+                                            blurRadius: 10.0,
+                                            offset: const Offset(0.0, 10.0),
+                                          )
+                                        ],
+                                      ),
                                       child: Padding(
-                                        padding: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
-                                        child: SizedBox(
-                                          height: 60,
-                                          child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: _primaryColor,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(10),
+                                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  Image.asset(_roleToAvatar[_userRole] ?? 'assets/images/readonly-avatar.png'),
+                                                ],
                                               ),
                                             ),
-                                            onPressed: !_nfcSessionRunning ? _ndefWrite : null,
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: const [
-                                                Icon(
-                                                  Icons.edit
-                                                ),
-                                                Text(
-                                                  'NFC Etikete Yaz',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 18.0,
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    widget.username,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: _primaryColor,
+                                                    ),
                                                   ),
-                                                ),
+                                                  Text(
+                                                    _roles[_userRole] ?? _userRole,
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: _primaryColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 40.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: SizedBox(
+                                          height: 60,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(30.0),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: _shadowColor,
+                                                  blurRadius: 10.0,
+                                                  offset: const Offset(0.0, 10.0),
+                                                )
                                               ],
+                                            ),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: _tertiaryColor,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(30.0),
+                                                ),
+                                              ),
+                                              onPressed: !_nfcSessionRunning ? _tagRead : null,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 32,
+                                                      width: 32,
+                                                      child: Image.asset('assets/images/nfctag32.png'),
+                                                    ),
+                                                    Text(
+                                                      'Etiket Oku',
+                                                      style: TextStyle(
+                                                        color: _primaryColor,
+                                                        fontSize: 16.0,
+                                                        fontWeight: FontWeight.w700,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Visibility(
-                                visible: _roleExists,
-                                child: Column(
-                                  children: [
-                                    const Divider(
-                                      indent: 25,
-                                      endIndent: 25,
-                                      thickness: 2,
-                                    ),
-                                    Row(
+                                Visibility(
+                                  visible: _canWriteVictim,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 20.0),
+                                    child: Row(
                                       children: [
                                         Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(30.0),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: _shadowColor,
+                                                  blurRadius: 10.0,
+                                                  offset: const Offset(0.0, 10.0),
+                                                )
+                                              ],
+                                            ),
                                             child: SizedBox(
                                               height: 60,
                                               child: ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.white,
+                                                  backgroundColor: _tertiaryColor,
+                                                  elevation: 0,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius: BorderRadius.circular(30.0),
+                                                  ),
+                                                ),
+                                                onPressed: !_nfcSessionRunning ? _ndefWrite : null,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.edit,
+                                                        size: 32.0,
+                                                        color: _primaryColor,
+                                                      ),
+                                                      Text(
+                                                        'Depremzede Bilgisi Yaz',
+                                                        style: TextStyle(
+                                                          color: _primaryColor,
+                                                          fontSize: 16.0,
+                                                          fontWeight: FontWeight.w700,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: _roleExists,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: SizedBox(
+                                            height: 90,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(30.0),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: _shadowColor,
+                                                    blurRadius: 10.0,
+                                                    offset: const Offset(0.0, 10.0),
+                                                  )
+                                                ],
+                                              ),
+                                              child: ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: _tertiaryColor,
+                                                  elevation: 0,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(30.0),
                                                   ),
                                                 ),
                                                 onPressed: !_nfcSessionRunning ? _ndefRoleBasedRecordWrite : null,
-                                                child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                   children: [
-                                                    const Icon(
-                                                      Icons.add_rounded,
-                                                      color: Colors.deepOrange,
+                                                    SizedBox(
+                                                      height: 32,
+                                                      width: 32,
+                                                      child: Image.asset(_roleToIcon[_userRole] ?? 'assets/images/crescent32.png'),
                                                     ),
                                                     Text(
                                                       '${_roles[_userRole]} Kaydı Ekle',
-                                                      style: const TextStyle(
-                                                        color: Colors.deepOrange,
-                                                        fontSize: 18.0,
+                                                      style: TextStyle(
+                                                        color: _primaryColor,
+                                                        fontSize: 16.0,
+                                                        fontWeight: FontWeight.w700,
                                                       ),
                                                     ),
                                                   ],
@@ -230,66 +356,127 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 16),
-                                child: TextButton(
-                                    onPressed: !_nfcSessionRunning ? () async {
-                                      _deleteCredentials();
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const LoginPage()),
-                                      );
-                                    } : null,
-                                    child: const Text('Çıkış Yap')
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20.0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(30.0),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: _shadowColor,
+                                                blurRadius: 10.0,
+                                                offset: const Offset(0.0, 10.0),
+                                              )
+                                            ],
+                                          ),
+                                          child: SizedBox(
+                                            height: 60,
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: _primaryColor,
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(30.0),
+                                                ),
+                                              ),
+                                              onPressed: !_nfcSessionRunning ? () {
+                                                Navigator.push<String>(
+                                                  context,
+                                                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                                                );
+                                              }: null,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                                                child: Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    const SizedBox(
+                                                      height: 32,
+                                                      width: 32,
+                                                      child: Icon(Icons.search),
+                                                    ),
+                                                    Text(
+                                                      'Ara',
+                                                      style: TextStyle(
+                                                        color: _tertiaryColor,
+                                                        fontSize: 16.0,
+                                                        fontWeight: FontWeight.w700,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Visibility(
-                            visible: _nfcSessionRunning,
+                      Center(
+                        child: Visibility(
+                          visible: _nfcSessionRunning,
+                          child: SizedBox(
+                            height: 120,
                             child: Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                color: Colors.white,
-                                boxShadow: const [
+                                borderRadius: BorderRadius.circular(30.0),
+                                color: _tertiaryColor,
+                                boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black26,
-                                    spreadRadius: 3,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 3),
+                                    color: _shadowColor,
+                                    blurRadius: 10.0,
+                                    offset: const Offset(0.0, 10.0),
                                   )
                                 ]
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+                                padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      _dialogText,
+                                    LinearProgressIndicator(
+                                      color: _tertiaryColor,
+                                      backgroundColor: _primaryColor,
                                     ),
-                                    const Padding(padding: EdgeInsets.only(top: 20.0)),
-                                    const CircularProgressIndicator(),
-                                    const Padding(padding: EdgeInsets.only(top: 20.0)),
-                                    TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _nfcSessionRunning = false;
-                                        });
-                                        NfcManager.instance.stopSession();
-                                      },
-                                      child: const Text('İptal Et'),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          _dialogText,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _primaryColor,
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _nfcSessionRunning = false;
+                                            });
+                                            NfcManager.instance.stopSession();
+                                          },
+                                          child: Text(
+                                            'İptal Et',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              color: _primaryColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     )
                                   ],
                                 ),
@@ -297,9 +484,9 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
           ),
         ),
