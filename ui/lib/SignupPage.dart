@@ -89,363 +89,359 @@ class _SignupPageState extends State<SignupPage> {
                       ? Center(child: Text('NFC is available: ${ss.data}'))
                       :*/ Padding(
                         padding: const EdgeInsets.all(20.0),
-                        child: Stack(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: SizedBox(
-                                    height: 60,
-                                    child: Image.asset('assets/images/dost_large.png'),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: SizedBox(
+                                height: 60,
+                                child: Image.asset('assets/images/dost_large.png'),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: SizedBox(
+                                height: 90,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: _tertiaryColor,
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _shadowColor,
+                                        blurRadius: 10.0,
+                                        offset: const Offset(0.0, 10.0),
+                                      )
+                                    ],
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: SizedBox(
-                                    height: 90,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: _tertiaryColor,
-                                        borderRadius: BorderRadius.circular(30.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _shadowColor,
-                                            blurRadius: 10.0,
-                                            offset: const Offset(0.0, 10.0),
-                                          )
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Kullanıcı Adı',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _primaryColor,
+                                          ),
+                                        ),
+                                        const Padding(padding: EdgeInsets.only(top: 12.0)),
+                                        Row(
                                           children: [
-                                            Text(
-                                              'Kullanıcı Adı',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: _primaryColor,
+                                            Icon(
+                                              Icons.account_circle_rounded,
+                                              size: 20.0,
+                                              color: _primaryColor,
+                                            ),
+                                            const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                            Expanded(
+                                              child: SizedBox(
+                                                height: 20.0,
+                                                child: TextFormField(
+                                                  cursorColor: _primaryColor,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: _primaryColor,
+                                                  ),
+                                                  controller: _usernameInputController,
+                                                  inputFormatters: <TextInputFormatter>[
+                                                    FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]'))
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                            const Padding(padding: EdgeInsets.only(top: 12.0)),
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.account_circle_rounded,
-                                                  size: 20.0,
-                                                  color: _primaryColor,
-                                                ),
-                                                const Padding(padding: EdgeInsets.only(left: 10.0)),
-                                                Expanded(
-                                                  child: SizedBox(
-                                                    height: 20.0,
-                                                    child: TextFormField(
-                                                      cursorColor: _primaryColor,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: _primaryColor,
-                                                      ),
-                                                      controller: _usernameInputController,
-                                                      inputFormatters: <TextInputFormatter>[
-                                                        FilteringTextInputFormatter.allow(RegExp('[A-Za-z0-9]'))
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
                                           ],
-                                        ),
-                                      ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: SizedBox(
-                                    height: 90,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: _tertiaryColor,
-                                        borderRadius: BorderRadius.circular(30.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _shadowColor,
-                                            blurRadius: 10.0,
-                                            offset: const Offset(0.0, 10.0),
-                                          )
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: SizedBox(
+                                height: 90,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: _tertiaryColor,
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _shadowColor,
+                                        blurRadius: 10.0,
+                                        offset: const Offset(0.0, 10.0),
+                                      )
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Şifre',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _primaryColor,
+                                          ),
+                                        ),
+                                        Row(
                                           children: [
-                                            Text(
-                                              'Şifre',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: _primaryColor,
+                                            Icon(
+                                              Icons.key,
+                                              size: 20.0,
+                                              color: _primaryColor,
+                                            ),
+                                            const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                            Expanded(
+                                              child: SizedBox(
+                                                height: 20.0,
+                                                child: TextFormField(
+                                                  cursorColor: _primaryColor,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: _primaryColor,
+                                                  ),
+                                                  controller: _passwordInputController,
+                                                  obscureText: _passwordObscured,
+                                                  obscuringCharacter: '●',
+                                                  enableSuggestions: false,
+                                                  autocorrect: false,
+                                                ),
                                               ),
                                             ),
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.key,
-                                                  size: 20.0,
-                                                  color: _primaryColor,
+                                            SizedBox(
+                                              height: 32.0,
+                                              width: 32.0,
+                                              child: IconButton(
+                                                iconSize: 20.0,
+                                                color: _primaryColor,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _passwordObscured = !_passwordObscured;
+                                                  });
+                                                },
+                                                icon: Icon(
+                                                    _passwordObscured
+                                                        ? Icons.visibility_off : Icons.visibility
                                                 ),
-                                                const Padding(padding: EdgeInsets.only(left: 10.0)),
-                                                Expanded(
-                                                  child: SizedBox(
-                                                    height: 20.0,
-                                                    child: TextFormField(
-                                                      cursorColor: _primaryColor,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: _primaryColor,
-                                                      ),
-                                                      controller: _passwordInputController,
-                                                      obscureText: _passwordObscured,
-                                                      obscuringCharacter: '●',
-                                                      enableSuggestions: false,
-                                                      autocorrect: false,
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  height: 32.0,
-                                                  width: 32.0,
-                                                  child: IconButton(
-                                                    iconSize: 20.0,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: SizedBox(
+                                height: 90,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: _tertiaryColor,
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _shadowColor,
+                                        blurRadius: 10.0,
+                                        offset: const Offset(0.0, 10.0),
+                                      )
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Şifreyi Tekrarla',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _primaryColor,
+                                          ),
+                                        ),
+                                        const Padding(padding: EdgeInsets.only(top: 12.0)),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.key,
+                                              size: 20.0,
+                                              color: _primaryColor,
+                                            ),
+                                            const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                            Expanded(
+                                              child: SizedBox(
+                                                height: 20.0,
+                                                child: TextFormField(
+                                                  cursorColor: _primaryColor,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
                                                     color: _primaryColor,
+                                                  ),
+                                                  controller: _passwordRepeatInputController,
+                                                  obscureText: _passwordObscured,
+                                                  obscuringCharacter: '●',
+                                                  enableSuggestions: false,
+                                                  autocorrect: false,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: SizedBox(
+                                height: 90,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: _tertiaryColor,
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _shadowColor,
+                                        blurRadius: 10.0,
+                                        offset: const Offset(0.0, 10.0),
+                                      )
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                        child: Text(
+                                          'Ekip Seçin',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _primaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                      const Padding(padding: EdgeInsets.only(top: 12.0)),
+                                      Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 32,
+                                            child: ListView.builder(
+                                              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount: _roles.length,
+                                              itemBuilder: (context, index) {
+                                                final key = _roles.keys.elementAt(index);
+                                                final value = _roles[key];
+                                                return Padding(
+                                                  padding: const EdgeInsets.only(right: 8.0,),
+                                                  child: OutlinedButton(
                                                     onPressed: () {
                                                       setState(() {
-                                                        _passwordObscured = !_passwordObscured;
+                                                        _selectedRole = key;
                                                       });
                                                     },
-                                                    icon: Icon(
-                                                        _passwordObscured
-                                                            ? Icons.visibility_off : Icons.visibility
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: SizedBox(
-                                    height: 90,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: _tertiaryColor,
-                                        borderRadius: BorderRadius.circular(30.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _shadowColor,
-                                            blurRadius: 10.0,
-                                            offset: const Offset(0.0, 10.0),
-                                          )
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Şifreyi Tekrarla',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: _primaryColor,
-                                              ),
-                                            ),
-                                            const Padding(padding: EdgeInsets.only(top: 12.0)),
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.key,
-                                                  size: 20.0,
-                                                  color: _primaryColor,
-                                                ),
-                                                const Padding(padding: EdgeInsets.only(left: 10.0)),
-                                                Expanded(
-                                                  child: SizedBox(
-                                                    height: 20.0,
-                                                    child: TextFormField(
-                                                      cursorColor: _primaryColor,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: _primaryColor,
+                                                    style: OutlinedButton.styleFrom(
+                                                      side: BorderSide(
+                                                        width: 1.0,
+                                                        color: _selectedBoxColor,
                                                       ),
-                                                      controller: _passwordRepeatInputController,
-                                                      obscureText: _passwordObscured,
-                                                      obscuringCharacter: '●',
-                                                      enableSuggestions: false,
-                                                      autocorrect: false,
+                                                      backgroundColor: _selectedRole == key ? _selectedBoxColor : _unselectedBoxColor,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      value ?? 'Bulunamadı',
+                                                      style: TextStyle(
+                                                        color: _selectedRole == key ? _selectedTextColor : _unselectedTextColor,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: SizedBox(
-                                    height: 90,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: _tertiaryColor,
-                                        borderRadius: BorderRadius.circular(30.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _shadowColor,
-                                            blurRadius: 10.0,
-                                            offset: const Offset(0.0, 10.0),
+                                                );
+                                              },
+                                            ),
                                           )
                                         ],
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                                            child: Text(
-                                              'Ekip Seçin',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: _primaryColor,
-                                              ),
-                                            ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20, bottom: 120),
+                              child: SizedBox(
+                                height: 90,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: _tertiaryColor,
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: _shadowColor,
+                                        blurRadius: 10.0,
+                                        offset: const Offset(0.0, 10.0),
+                                      )
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'Yetkilendirme Kodu',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: _primaryColor,
                                           ),
-                                          const Padding(padding: EdgeInsets.only(top: 12.0)),
-                                          Column(
-                                            children: [
-                                              SizedBox(
-                                                height: 32,
-                                                child: ListView.builder(
-                                                  padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                                                  scrollDirection: Axis.horizontal,
-                                                  itemCount: _roles.length,
-                                                  itemBuilder: (context, index) {
-                                                    final key = _roles.keys.elementAt(index);
-                                                    final value = _roles[key];
-                                                    return Padding(
-                                                      padding: const EdgeInsets.only(right: 8.0,),
-                                                      child: OutlinedButton(
-                                                        onPressed: () {
-                                                          setState(() {
-                                                            _selectedRole = key;
-                                                          });
-                                                        },
-                                                        style: OutlinedButton.styleFrom(
-                                                          side: BorderSide(
-                                                            width: 1.0,
-                                                            color: _selectedBoxColor,
-                                                          ),
-                                                          backgroundColor: _selectedRole == key ? _selectedBoxColor : _unselectedBoxColor,
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(10),
-                                                          ),
-                                                        ),
-                                                        child: Text(
-                                                          value ?? 'Bulunamadı',
-                                                          style: TextStyle(
-                                                            color: _selectedRole == key ? _selectedTextColor : _unselectedTextColor,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20, bottom: 120),
-                                  child: SizedBox(
-                                    height: 90,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: _tertiaryColor,
-                                        borderRadius: BorderRadius.circular(30.0),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: _shadowColor,
-                                            blurRadius: 10.0,
-                                            offset: const Offset(0.0, 10.0),
-                                          )
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                        ),
+                                        const Padding(padding: EdgeInsets.only(top: 12.0)),
+                                        Row(
                                           children: [
-                                            Text(
-                                              'Yetkilendirme Kodu',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: _primaryColor,
+                                            Icon(
+                                              Icons.lock,
+                                              size: 20.0,
+                                              color: _primaryColor,
+                                            ),
+                                            const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                            Expanded(
+                                              child: SizedBox(
+                                                height: 20.0,
+                                                child: TextFormField(
+                                                  cursorColor: _primaryColor,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: _primaryColor,
+                                                  ),
+                                                  controller: _authTokenInputController,
+                                                  enableSuggestions: false,
+                                                  autocorrect: false,
+                                                ),
                                               ),
                                             ),
-                                            const Padding(padding: EdgeInsets.only(top: 12.0)),
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.lock,
-                                                  size: 20.0,
-                                                  color: _primaryColor,
-                                                ),
-                                                const Padding(padding: EdgeInsets.only(left: 10.0)),
-                                                Expanded(
-                                                  child: SizedBox(
-                                                    height: 20.0,
-                                                    child: TextFormField(
-                                                      cursorColor: _primaryColor,
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: _primaryColor,
-                                                      ),
-                                                      controller: _authTokenInputController,
-                                                      enableSuggestions: false,
-                                                      autocorrect: false,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
                                           ],
-                                        ),
-                                      ),
+                                        )
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ],
                         ),
