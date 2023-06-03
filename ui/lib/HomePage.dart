@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   final Map<String, String> _roleToAvatar = {
     'clinic': 'assets/images/hospital-avatar.png',
     'er': 'assets/images/hospital-avatar.png',
-    'firstaid': 'assets/images/hospital-avatar.png',
+    'firstaid': 'assets/images/firstaid-avatar.png',
     'morgue': 'assets/images/hospital-avatar.png',
     'rescue': 'assets/images/rescue-avatar.png',
     'burial': 'assets/images/burial-avatar.png',

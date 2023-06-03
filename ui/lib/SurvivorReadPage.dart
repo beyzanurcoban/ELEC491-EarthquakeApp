@@ -144,9 +144,9 @@ class _SurvivorReadPageState extends State<SurvivorReadPage> {
 
                               Text(
                                 "Etiket ID: ${widget.ndefUID}",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14.0,
-                                  color: Colors.black54,
+                                  color: _primaryColor,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),

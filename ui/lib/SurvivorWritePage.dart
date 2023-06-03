@@ -424,7 +424,7 @@ class TextInputFieldWidget extends StatelessWidget {
                     color: _primaryColor,
                   ),
                 ),
-                const Padding(padding: EdgeInsets.only(top: 12.0)),
+                const Padding(padding: EdgeInsets.only(top: 10.0)),
                 Row(
                   children: [
                     Expanded(
@@ -433,6 +433,9 @@ class TextInputFieldWidget extends StatelessWidget {
                         child: TextFormField(
                           decoration: InputDecoration(
                             labelText: labelText,
+                            floatingLabelStyle: const TextStyle(
+                              color: Colors.transparent
+                            )
                           ),
                           cursorColor: _primaryColor,
                           style: const TextStyle(

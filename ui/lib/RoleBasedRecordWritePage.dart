@@ -21,6 +21,12 @@ class RoleBasedRecordWritePage extends StatefulWidget {
   _RoleBasedRecordWritePageState createState() => _RoleBasedRecordWritePageState();
 }
 
+const Color _primaryColor = Color(0xff6a6b83);
+const Color _secondaryColor = Color(0xff77789a);
+const Color _tertiaryColor = Color(0xffebebeb);
+const Color _backgroundColor = Color(0xffd5d5e4);
+const Color _shadowColor = Color(0x806a6b83);
+
 class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   final Map<String, String> _roles = {
     'clinic': 'Hastane',
@@ -49,10 +55,10 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
     3: 'Ölü'
   };
 
-  final Color _selectedBoxColor = Colors.blue;
+  final Color _selectedBoxColor = _primaryColor;
   final Color _unselectedBoxColor = Colors.transparent;
-  final Color _selectedTextColor = Colors.white;
-  final Color _unselectedTextColor = Colors.blue;
+  final Color _selectedTextColor = _tertiaryColor;
+  final Color _unselectedTextColor = _primaryColor;
 
   bool stayStatus = false;
 
@@ -94,12 +100,12 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   // Fill these from Master tables in DB
   Map<String, String> _hospitalIDtoName = {};
   Map<String, String> _cemeteryIDtoName = {};
-  List<String> _plateNumbers = [];
+  Map<String, String> _plateNumbers = {};
 
   late FirebaseFirestore db;
 
-  List<String> _provinces = []; // stores the provinces from the JSON data
-  Map<String, List<String>> _cities = {}; // stores the cities by province
+  List<String> _provinces = [];
+  Map<String, List<String>> _districts = {};
 
   String _selectedProvince = '';
   String _selectedCity = '';
@@ -120,738 +126,554 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        middle: Text(
-          "${_roles[widget.role]} Kaydı",
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 30.0),
-                child: Text(
-                  "Depremzede Etiket ID: ${widget.ndefUID}\n"
-                      "Kullanıcı: ${widget.username}",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 15.0,
-                    color: Colors.black38,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('hospital_id') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Hastane',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      FutureBuilder(
-                        future: _getHospitals(),
-                        builder: (context, snapshot) {
-                          return DropdownSearch(
-                            clearButtonProps: ClearButtonProps(
-                              isVisible: _selectedHospitalName != '',
-                              onPressed: () {
-                                setState(() {
-                                  _selectedHospitalName = '';
-                                });
-                              }
-                            ),
-                            popupProps: const PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                  decoration: InputDecoration(
-                                      hintText: 'Buradan hastane arayın.'
-                                  )
+      backgroundColor: _backgroundColor,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Stack(
+              children: [
+                Stack(
+                  children: [
+                    SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          children: [
+                            const Padding(padding: EdgeInsets.only(top: 50.0)),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20.0),
+                              child: SizedBox(
+                                height: 90,
+                                width: MediaQuery.of(context).size.width,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: _tertiaryColor,
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: _shadowColor,
+                                        blurRadius: 10.0,
+                                        offset: Offset(0.0, 10.0),
+                                      )
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${_roles[widget.role]} Kaydı',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 16.0,
+                                          color: _primaryColor,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const Padding(padding: EdgeInsets.only(top: 5.0)),
+                                      Text(
+                                        'Etiket ID: ${widget.ndefUID}',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 14.0,
+                                          color: _primaryColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                            selectedItem: _selectedHospitalName,
-                            items: _hospitalIDtoName.values.toList(),
-                            onChanged: (selectedItem) {
-                              setState(() {
-                                _selectedHospitalName = selectedItem!;
-                                _selectedHospitalID = _hospitalIDtoName.keys.firstWhere((id) => _hospitalIDtoName[id] == _selectedHospitalName);
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('cemetery_id') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Mezarlık',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      FutureBuilder(
-                        future: _getCemeteries(),
-                        builder: (context, snapshot) {
-                          return DropdownSearch(
-                            clearButtonProps: ClearButtonProps(
-                              isVisible: _selectedCemeteryName != '',
-                              onPressed: () {
-                                setState(() {
-                                  _selectedCemeteryName = '';
-                                });
-                              }
-                            ),
-                            popupProps: const PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                  decoration: InputDecoration(
-                                      hintText: 'Buradan mezarlık arayın.'
-                                  )
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('hospital_id') ?? false,
+                              child: DropdownFromDBFieldWidget(
+                                title: 'Hastane',
+                                hintText: 'Buradan hastane arayın',
+                                selectedDbItem: _selectedHospitalName,
+                                selectedDbItemID: _selectedHospitalID,
+                                getterFunction: _getHospitals(),
+                                dbItemsIdToName: _hospitalIDtoName,
                               ),
                             ),
-                            selectedItem: _selectedCemeteryName,
-                            items: _cemeteryIDtoName.values.toList(),
-                            onChanged: (selectedItem) {
-                              setState(() {
-                                _selectedCemeteryName = selectedItem!;
-                                _selectedCemeteryID = _cemeteryIDtoName.keys.firstWhere((id) => _cemeteryIDtoName[id] == _selectedCemeteryName);
-                              });
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('plate_number') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Ambulans Plakası',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('cemetery_id') ?? false,
+                              child: DropdownFromDBFieldWidget(
+                                title: 'Mezarlık',
+                                hintText: 'Buradan mezarlık arayın',
+                                selectedDbItem: _selectedCemeteryName,
+                                selectedDbItemID: _selectedCemeteryID,
+                                getterFunction: _getCemeteries(),
+                                dbItemsIdToName: _cemeteryIDtoName,
+                              ),
+                            ),
+                            Visibility(
+                              visible:  _dbFields[widget.role]?.contains('plate_number') ?? false,
+                              child: DropdownFromDBFieldWidget(
+                                title: 'Ambulans',
+                                hintText: 'Buradan plaka arayın',
+                                selectedDbItem: _selectedPlateNumber,
+                                selectedDbItemID: _selectedPlateNumber,
+                                getterFunction: _getPlateNumbers(),
+                                dbItemsIdToName: _plateNumbers,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('enter_datetime') ?? false,
+                              child: DateSelectorWidget(
+                                title: 'Giriş Tarihi',
+                                date: enterDate,
+                                isDateSelected: _isEnterDateSelected,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('discharge_datetime') ?? false,
+                              child: DateSelectorWidget(
+                                title: 'Çıkış Tarihi',
+                                date: dischargeDate,
+                                isDateSelected: _isDischargeDateSelected,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('applied_datetime') ?? false,
+                              child: DateSelectorWidget(
+                                title: 'İlk Yardım Tarihi',
+                                date: appliedDate,
+                                isDateSelected: _isAppliedDateSelected,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('rescue_datetime') ?? false,
+                              child: DateSelectorWidget(
+                                title: 'Kurtarma Tarihi',
+                                date: rescueDate,
+                                isDateSelected: _isRescueDateSelected,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('burial_datetime') ?? false,
+                              child: DateSelectorWidget(
+                                title: 'Defin Tarihi',
+                                date: burialDate,
+                                isDateSelected: _isBurialDateSelected,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('victim_condition') ?? false,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: SizedBox(
+                                  height: 120,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: _tertiaryColor,
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: _shadowColor,
+                                          blurRadius: 10.0,
+                                          offset: Offset(0.0, 10.0),
+                                        )
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 30.0, right: 30.0),
+                                          child: Text(
+                                            'Depremzede Sağlık Durumu',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: _primaryColor,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        const Padding(padding: EdgeInsets.only(top: 20.0)),
+                                        Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 32,
+                                              child: ListView.builder(
+                                                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                                                scrollDirection: Axis.horizontal,
+                                                itemCount: _victimConditions.length,
+                                                itemBuilder: (context, index) {
+                                                  final key = _victimConditions.keys.elementAt(index);
+                                                  final value = _victimConditions[key];
+                                                  return Padding(
+                                                    padding: const EdgeInsets.only(right: 8.0,),
+                                                    child: OutlinedButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          victimCondition = key;
+                                                        });
+                                                      },
+                                                      style: OutlinedButton.styleFrom(
+                                                        side: BorderSide(
+                                                          width: 1.0,
+                                                          color: _selectedBoxColor,
+                                                        ),
+                                                        backgroundColor: victimCondition == key ? _selectedBoxColor : _unselectedBoxColor,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        value ?? 'Bulunamadı',
+                                                        style: TextStyle(
+                                                          color: victimCondition == key ? _selectedTextColor : _unselectedTextColor,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            )
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('province') ?? false,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20.0),
+                                child: SizedBox(
+                                  height: 60,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: _tertiaryColor,
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: _shadowColor,
+                                          blurRadius: 10.0,
+                                          offset: Offset(0.0, 10.0),
+                                        )
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 30.0, right: 0.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          const Text(
+                                            'İl',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: _primaryColor,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                          Expanded(
+                                            child: DropdownSearch<String>(
+                                              dropdownDecoratorProps: const DropDownDecoratorProps(
+                                                baseStyle: TextStyle(
+                                                  fontSize: 14,
+                                                  color: _primaryColor,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                textAlignVertical: TextAlignVertical.center,
+                                                textAlign: TextAlign.end,
+                                                dropdownSearchDecoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                ),
+                                              ),
+                                              dropdownButtonProps: const DropdownButtonProps(
+                                                color: _primaryColor,
+                                              ),
+                                              clearButtonProps: ClearButtonProps(
+                                                  isVisible: _selectedProvince != '',
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _selectedProvince = '';
+                                                    });
+                                                  }
+                                              ),
+                                              popupProps: const PopupProps.modalBottomSheet(
+                                                showSearchBox: true,
+                                                searchFieldProps: TextFieldProps(
+                                                    decoration: InputDecoration(
+                                                        hintText: 'Buradan il arayın.'
+                                                    )
+                                                ),
+                                              ),
+                                              selectedItem: _selectedProvince,
+                                              items: _provinces.toList(),
+                                              onChanged: (selectedItem) {
+                                                setState(() {
+                                                  _selectedProvince = selectedItem!;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('city') ?? false,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20.0),
+                                child: SizedBox(
+                                  height: 60,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: _tertiaryColor,
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: _shadowColor,
+                                          blurRadius: 10.0,
+                                          offset: Offset(0.0, 10.0),
+                                        )
+                                      ],
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 30.0, right: 0.0),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          const Text(
+                                            'İlçe',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: _primaryColor,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                          Expanded(
+                                            child: DropdownSearch<String>(
+                                              dropdownDecoratorProps: const DropDownDecoratorProps(
+                                                baseStyle: TextStyle(
+                                                  fontSize: 14,
+                                                  color: _primaryColor,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                textAlignVertical: TextAlignVertical.center,
+                                                textAlign: TextAlign.end,
+                                                dropdownSearchDecoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                ),
+                                              ),
+                                              dropdownButtonProps: const DropdownButtonProps(
+                                                color: _primaryColor,
+                                              ),
+                                              clearButtonProps: ClearButtonProps(
+                                                  isVisible: _selectedCity != '',
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _selectedCity = '';
+                                                    });
+                                                  }
+                                              ),
+                                              popupProps: const PopupProps.modalBottomSheet(
+                                                showSearchBox: true,
+                                                searchFieldProps: TextFieldProps(
+                                                    decoration: InputDecoration(
+                                                        hintText: 'Buradan ilçe arayın.'
+                                                    )
+                                                ),
+                                              ),
+                                              selectedItem: _selectedCity,
+                                              items: _selectedProvince != null && _selectedProvince.isNotEmpty
+                                              ? [...?_districts[_selectedProvince]]
+                                              : [],
+                                              onChanged: (selectedItem) {
+                                                setState(() {
+                                                  _selectedCity = selectedItem!;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('neighbourhood') ?? false,
+                              child: TextInputFieldWidget(
+                                title: 'Mahalle',
+                                controller: _neighbourhoodInputController,
+                                labelText: neighbourhood,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('street') ?? false,
+                              child: TextInputFieldWidget(
+                                title: 'Sokak',
+                                controller: _streetInputController,
+                                labelText: street,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('building') ?? false,
+                              child: TextInputFieldWidget(
+                                title: 'Bina',
+                                controller: _buildingInputController,
+                                labelText: building,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('grave_number') ?? false,
+                              child: TextInputFieldWidget(
+                                title: 'Mezarlık Numarası',
+                                controller: _graveNumberInputController,
+                                labelText: graveNumber,
+                              ),
+                            ),
+                            Visibility(
+                              visible: _dbFields[widget.role]?.contains('notes') ?? false,
+                              child: TextInputFieldWidget(
+                                title: 'Notlar',
+                                controller: _notesInputController,
+                                labelText: notes,
+                              ),
+                            ),
+                            const Padding(padding: EdgeInsets.only(bottom: 100.0)),
+                          ],
                         ),
                       ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      FutureBuilder(
-                        future: _getPlateNumbers(),
-                        builder: (context, snapshot) {
-                          return DropdownSearch<String>(
-                            clearButtonProps: ClearButtonProps(
-                              isVisible: _selectedPlateNumber != '',
-                              onPressed: () {
-                                setState(() {
-                                  _selectedPlateNumber = '';
-                                });
-                              }
-                            ),
-                            popupProps: const PopupProps.menu(
-                              showSearchBox: true,
-                              searchFieldProps: TextFieldProps(
-                                decoration: InputDecoration(
-                                  hintText: 'Buradan plaka arayın.'
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0, bottom: 20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                            height: 60,
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: _tertiaryColor,
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: _shadowColor,
+                                      blurRadius: 10.0,
+                                      offset: Offset(0.0, 10.0),
+                                    )
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        child: SizedBox(
+                                          height: 60,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: _primaryColor,
+                                              borderRadius: BorderRadius.circular(30.0),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: _shadowColor,
+                                                  blurRadius: 10.0,
+                                                  offset: Offset(0.0, 10.0),
+                                                )
+                                              ],
+                                            ),
+                                            child: TextButton(
+                                              onPressed: () async {
+                                                writeRecordToDB();
+                                                Navigator.pop(context);
+                                              },
+                                              child: Stack(
+                                                children: const [
+                                                  Center(
+                                                    child: Text(
+                                                      'Kayıt Gir',
+                                                      style: TextStyle(
+                                                          color: _tertiaryColor,
+                                                          fontSize: 16.0,
+                                                          fontWeight: FontWeight.w700
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                    )
+                                  ],
                                 )
-                              ),
                             ),
-                            selectedItem: _selectedPlateNumber,
-                            items: _plateNumbers,
-                            onChanged: (selectedItem) {
-                              setState(() {
-                                _selectedPlateNumber = selectedItem!;
-                              });
-                            },
-                          );
-                        },
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('enter_datetime') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Giriş Tarihi',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final DateTime? selectedDate = await showDatePicker(
-                            context: context,
-                            initialDate: enterDate,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          ).then((selectedDate) {
-                            if (selectedDate != null) {
-                              showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(selectedDate),
-                              ).then((selectedTime) {
-                                if (selectedTime != null) {
-                                  setState(() {
-                                    _isEnterDateSelected = true;
-                                    enterDate = DateTime(
-                                      selectedDate.year,
-                                      selectedDate.month,
-                                      selectedDate.day,
-                                      selectedTime.hour,
-                                      selectedTime.minute,
-                                    );
-                                  });
-                                }
-                              });
-                            }
-                            return null;
-                          });
-                        },
-                        child: Text(_isEnterDateSelected ? enterDate.toString() : 'Giriş Tarihi Seçin'),
-                      ),
-                    ]
-                  ),
+              ],
+            ),
+            SizedBox(
+              height: 60,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: _backgroundColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _shadowColor,
+                      blurRadius: 10.0,
+                      offset: Offset(0.0, 10.0),
+                    )
+                  ],
                 ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('discharge_datetime') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Çıkış Tarihi',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
+                child: Stack(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 32,
+                          width: MediaQuery.of(context).size.width,
+                          child: Image.asset('assets/images/dost_large.png'),
                         ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final DateTime? selectedDate = await showDatePicker(
-                            context: context,
-                            initialDate: dischargeDate,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          ).then((selectedDate) {
-                            if (selectedDate != null) {
-                              showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(selectedDate),
-                              ).then((selectedTime) {
-                                if (selectedTime != null) {
-                                  setState(() {
-                                    _isDischargeDateSelected = true;
-                                    dischargeDate = DateTime(
-                                      selectedDate.year,
-                                      selectedDate.month,
-                                      selectedDate.day,
-                                      selectedTime.hour,
-                                      selectedTime.minute,
-                                    );
-                                  });
-                                }
-                              });
-                            }
-                            return null;
-                          });
-                        },
-                        child: Text(_isDischargeDateSelected ? dischargeDate.toString() : 'Çıkış Tarihi Seç'),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('applied_datetime') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'İlk Yardım Uygulama Tarihi',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final DateTime? selectedDate = await showDatePicker(
-                            context: context,
-                            initialDate: appliedDate,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          ).then((selectedDate) {
-                            if (selectedDate != null) {
-                              showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(selectedDate),
-                              ).then((selectedTime) {
-                                if (selectedTime != null) {
-                                  setState(() {
-                                    _isAppliedDateSelected = true;
-                                    appliedDate = DateTime(
-                                      selectedDate.year,
-                                      selectedDate.month,
-                                      selectedDate.day,
-                                      selectedTime.hour,
-                                      selectedTime.minute,
-                                    );
-                                  });
-                                }
-                              });
-                            }
-                            return null;
-                          });
-                        },
-                        child: Text(appliedDate.toString()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('rescue_datetime') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Depremzede Kurtarma Tarihi',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final DateTime? selectedDate = await showDatePicker(
-                            context: context,
-                            initialDate: rescueDate,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          ).then((selectedDate) {
-                            if (selectedDate != null) {
-                              showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(selectedDate),
-                              ).then((selectedTime) {
-                                if (selectedTime != null) {
-                                  setState(() {
-                                    _isRescueDateSelected = true;
-                                    rescueDate = DateTime(
-                                      selectedDate.year,
-                                      selectedDate.month,
-                                      selectedDate.day,
-                                      selectedTime.hour,
-                                      selectedTime.minute,
-                                    );
-                                  });
-                                }
-                              });
-                            }
-                            return null;
-                          });
-                        },
-                        child: Text(_isRescueDateSelected ? rescueDate.toString() : DateTime.now().toString()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('burial_datetime') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Defnedilme Tarihi',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      ElevatedButton(
-                        onPressed: () async {
-                          final DateTime? selectedDate = await showDatePicker(
-                            context: context,
-                            initialDate: burialDate,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                          ).then((selectedDate) {
-                            if (selectedDate != null) {
-                              showTimePicker(
-                                context: context,
-                                initialTime: TimeOfDay.fromDateTime(selectedDate),
-                              ).then((selectedTime) {
-                                if (selectedTime != null) {
-                                  setState(() {
-                                    _isBurialDateSelected = true;
-                                    burialDate = DateTime(
-                                      selectedDate.year,
-                                      selectedDate.month,
-                                      selectedDate.day,
-                                      selectedTime.hour,
-                                      selectedTime.minute,
-                                    );
-                                  });
-                                }
-                              });
-                            }
-                            return null;
-                          });
-                        },
-                        child: Text(_isBurialDateSelected ? burialDate.toString() : DateTime.now().toString()),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('victim_condition') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Depremzede Sağlık Durumu',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      SizedBox(
-                        height: 50, // adjust the height as needed
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _victimConditions.length,
-                          itemBuilder: (context, index) {
-                            final key = _victimConditions.keys.elementAt(index);
-                            final value = _victimConditions.values.elementAt(index);
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0, left: 16.0),
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    victimCondition = key;
-                                  });
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  side: const BorderSide(
-                                    width: 1.0,
-                                    color: Colors.blue,
-                                  ),
-                                  backgroundColor: victimCondition == key ? _selectedBoxColor : _unselectedBoxColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                    color: victimCondition == key ? _selectedTextColor : _unselectedTextColor,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('province') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'İl',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Padding(padding: EdgeInsets.only(top: 10)),
-                      DropdownSearch<String>(
-                        clearButtonProps: ClearButtonProps(
-                            isVisible: _selectedProvince != '',
-                            onPressed: () {
-                              setState(() {
-                                _selectedProvince = '';
-                              });
-                            }
-                        ),
-                        popupProps: const PopupProps.menu(
-                          showSearchBox: true,
-                          searchFieldProps: TextFieldProps(
-                              decoration: InputDecoration(
-                                  hintText: 'Buradan il arayın.'
-                              )
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () {Navigator.pop(context);},
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: _primaryColor,
+                            size: 32,
                           ),
                         ),
-                        selectedItem: _selectedProvince,
-                        items: _provinces.toList(),
-                        onChanged: (selectedItem) {
-                          setState(() {
-                            _selectedProvince = selectedItem!;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('city') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'İlçe',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      DropdownSearch<String>(
-                        clearButtonProps: ClearButtonProps(
-                            isVisible: _selectedCity != '',
-                            onPressed: () {
-                              setState(() {
-                                _selectedCity = '';
-                              });
-                            }
-                        ),
-                        popupProps: const PopupProps.menu(
-                          showSearchBox: true,
-                          searchFieldProps: TextFieldProps(
-                              decoration: InputDecoration(
-                                  hintText: 'Buradan ilçe arayın.'
-                              )
-                          ),
-                        ),
-                        selectedItem: _selectedCity,
-                        items: _selectedProvince != null && _selectedProvince.isNotEmpty
-                        ? [...?_cities[_selectedProvince]]
-                        : [],
-                        onChanged: (selectedItem) {
-                          setState(() {
-                            _selectedCity = selectedItem!;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('neighbourhood') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Mahalle',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _neighbourhoodInputController,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: neighbourhood,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('street') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Sokak',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _streetInputController,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: street,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('building') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Bina',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _buildingInputController,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: building,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('grave_number') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Mezarlık Numarası',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _graveNumberInputController,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: graveNumber,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: _dbFields[widget.role]?.contains('notes') ?? false,
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Notlar',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      TextFormField(
-                        controller: _notesInputController,
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: notes,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Center(
-                child: ElevatedButton(
-                    onPressed: () {
-                      writeRecordToDB();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Kayıt Gir'),
-                ),
-              ),
-            ],
-          ),
+            )
+          ],
         ),
       )
     );
   }
 
   Future<void> _populateProvinces() async {
-    List<String> provs = ['Adana', 'Adıyaman', 'Afyon', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin',
+    List<String> provinces = ['Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Amasya', 'Ankara', 'Antalya', 'Artvin',
         'Aydın', 'Balıkesir', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa', 'Çanakkale',
         'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir',
         'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Isparta', 'Mersin', 'İstanbul', 'İzmir',
@@ -861,13 +683,13 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
         'Van', 'Yozgat', 'Zonguldak', 'Aksaray', 'Bayburt', 'Karaman', 'Kırıkkale', 'Batman', 'Şırnak',
         'Bartın', 'Ardahan', 'Iğdır', 'Yalova', 'Karabük', 'Kilis', 'Osmaniye', 'Düzce'];
 
-    for (var i=0; i<provs.length; i++) {
-      _provinces.add(provs[i]);
+    for (var i=0; i<provinces.length; i++) {
+      _provinces.add(provinces[i]);
     }
   }
 
   Future<void> _populateCities() async {
-    Map<String, List<String>> cits = {
+    Map<String, List<String>> districts = {
       'Adana': ['Aladağ', 'Ceyhan', 'Çukurova', 'Feke', 'İmamoğlu', 'Karaisalı', 'Karataş', 'Kozan', 'Pozantı',
         'Saimbeyli', 'Sarıçam', 'Seyhan', 'Tufanbeyli', 'Yumurtalık', 'Yüreğir'],
       'Adıyaman': ['Besni', 'Çelikhan', 'Gerger', 'Gölbaşı', 'Kahta', 'Merkez', 'Samsat', 'Sincik', 'Tut'],
@@ -1002,7 +824,7 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
       'Düzce': ['Akçakoca', 'Cumayeri', 'Çilimli', 'Gölyaka', 'Gümüşova', 'Kaynaşlı', 'Merkez', 'Yığılca']
     };
 
-    cits.forEach((key, value) {_cities[key] = value;});
+    districts.forEach((key, value) {_districts[key] = value;});
   }
 
   Future<void> _getPlateNumbers() async {
@@ -1010,8 +832,9 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
       final snapshot = await db.collection('ambulance_master').get();
 
       for (var doc in snapshot.docs) {
+        var data = doc.data();
         setState(() {
-          _plateNumbers.add(doc.id);
+          _plateNumbers[doc.id] = doc.id;
         });
       }
     }
@@ -1211,5 +1034,329 @@ class _RoleBasedRecordWritePageState extends State<RoleBasedRecordWritePage> {
     } catch (e) {
       throw Exception('Failed to update record');
     }
+  }
+}
+
+class DropdownFromDBFieldWidget extends StatefulWidget {
+
+  final String title;
+  final String hintText;
+  String selectedDbItem;
+  String selectedDbItemID;
+  final Future<void> getterFunction;
+  Map<String, String> dbItemsIdToName;
+
+  DropdownFromDBFieldWidget({
+    Key? key,
+    required this.title,
+    required this.hintText,
+    required this.selectedDbItem,
+    required this.selectedDbItemID,
+    required this.getterFunction,
+    required this.dbItemsIdToName,
+  }) : super(key: key);
+
+  @override
+  _DropdownFromDBFieldWidgetState createState() => _DropdownFromDBFieldWidgetState();
+}
+
+class _DropdownFromDBFieldWidgetState extends State<DropdownFromDBFieldWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: SizedBox(
+        height: 60,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _tertiaryColor,
+            borderRadius: BorderRadius.circular(30.0),
+            boxShadow: const [
+              BoxShadow(
+                color: _shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0.0, 10.0),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 30.0, right: 0.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: _primaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(left: 10.0)),
+                Expanded(
+                  child: FutureBuilder(
+                    future: widget.getterFunction,
+                    builder: (context, snapshot) {
+                      return DropdownSearch(
+                        dropdownDecoratorProps: const DropDownDecoratorProps(
+                          baseStyle: TextStyle(
+                            fontSize: 14,
+                            color: _primaryColor,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          textAlignVertical: TextAlignVertical.center,
+                          textAlign: TextAlign.end,
+                          dropdownSearchDecoration: InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                        ),
+                        dropdownButtonProps: const DropdownButtonProps(
+                          color: _primaryColor,
+                        ),
+                        clearButtonProps: ClearButtonProps(
+                            isVisible: widget.selectedDbItem != '',
+                            onPressed: () {
+                              setState(() {
+                                widget.selectedDbItem = '';
+                              });
+                            }
+                        ),
+                        popupProps: PopupProps.modalBottomSheet(
+                          showSearchBox: true,
+                          searchFieldProps: TextFieldProps(
+                              decoration: InputDecoration(
+                                hintText: widget.hintText,
+                              )
+                          ),
+                        ),
+                        selectedItem: widget.selectedDbItem,
+                        items: widget.dbItemsIdToName.values.toList(),
+                        onChanged: (selectedItem) {
+                          setState(() {
+                            widget.selectedDbItem = selectedItem!;
+                            widget.selectedDbItemID = widget.dbItemsIdToName.keys.firstWhere((id) => widget.dbItemsIdToName[id] == widget.selectedDbItem);
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DateSelectorWidget extends StatefulWidget {
+
+  final String title;
+  DateTime date;
+  bool isDateSelected;
+
+  DateSelectorWidget({
+    Key? key,
+    required this.title,
+    required this.date,
+    required this.isDateSelected,
+  }) : super(key: key);
+
+  @override
+  _DateSelectorWidgetState createState() => _DateSelectorWidgetState();
+
+}
+
+class _DateSelectorWidgetState extends State<DateSelectorWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: SizedBox(
+        height: 130,
+        width: MediaQuery.of(context).size.width,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _tertiaryColor,
+            borderRadius: BorderRadius.circular(30.0),
+            boxShadow: const [
+              BoxShadow(
+                color: _shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0.0, 10.0),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0, top: 20.0, bottom: 20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: _primaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: _shadowColor,
+                        blurRadius: 10.0,
+                        offset: Offset(0.0, 10.0),
+                      )
+                    ],
+                  ),
+                  child: SizedBox(
+                    height: 60,
+                    width: MediaQuery.of(context).size.width,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _primaryColor,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final DateTime? selectedDate = await showDatePicker(
+                          context: context,
+                          initialDate: widget.date,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        ).then((selectedDate) {
+                          if (selectedDate != null) {
+                            showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.fromDateTime(selectedDate),
+                            ).then((selectedTime) {
+                              if (selectedTime != null) {
+                                setState(() {
+                                  widget.isDateSelected = true;
+                                  widget.date = DateTime(
+                                    selectedDate.year,
+                                    selectedDate.month,
+                                    selectedDate.day,
+                                    selectedTime.hour,
+                                    selectedTime.minute,
+                                  );
+                                });
+                              }
+                            });
+                          }
+                          return null;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text(
+                          widget.isDateSelected ? widget.date.toString() : '${widget.title} Seçin',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: _tertiaryColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      )
+    );
+  }
+}
+
+class TextInputFieldWidget extends StatefulWidget {
+
+  final String title;
+  final TextEditingController controller;
+  final String labelText;
+
+  TextInputFieldWidget({
+    Key? key,
+    required this.title,
+    required this.controller,
+    required this.labelText,
+  }) : super(key: key);
+
+  @override
+  _TextInputFieldWidgetState createState() => _TextInputFieldWidgetState();
+
+}
+
+class _TextInputFieldWidgetState extends State<TextInputFieldWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: SizedBox(
+        height: 90,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _tertiaryColor,
+            borderRadius: BorderRadius.circular(30.0),
+            boxShadow: const [
+              BoxShadow(
+                color: _shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0.0, 10.0),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: _primaryColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(top: 10.0)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 20,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: widget.labelText,
+                            floatingLabelStyle: const TextStyle(
+                                color: Colors.transparent
+                            ),
+                          ),
+                          cursorColor: _primaryColor,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: _primaryColor,
+                          ),
+                          controller: widget.controller,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
