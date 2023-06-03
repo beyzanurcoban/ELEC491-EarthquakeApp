@@ -12,14 +12,20 @@ class SearchPage extends StatefulWidget {
   _SearchPageState createState() => _SearchPageState();
 }
 
+const Color _primaryColor = Color(0xff6a6b83);
+const Color _secondaryColor = Color(0xff77789a);
+const Color _tertiaryColor = Color(0xffebebeb);
+const Color _backgroundColor = Color(0xffd5d5e4);
+const Color _shadowColor = Color(0x806a6b83);
+
 class _SearchPageState extends State<SearchPage> {
   bool _isLoading = false;
 
-  final Color _selectedBoxColor = Colors.blue;
+  final Color _selectedBoxColor = _primaryColor;
   final Color _unselectedBoxColor = Colors.transparent;
 
-  final Color _selectedTextColor = Colors.white;
-  final Color _unselectedTextColor = Colors.blue;
+  final Color _selectedTextColor = _tertiaryColor;
+  final Color _unselectedTextColor = _primaryColor;
 
   final TextEditingController _searchTermInputController = TextEditingController();
 
@@ -62,190 +68,278 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CupertinoNavigationBar(
-        middle: Text(
-          "Ara",
-        ),
-      ),
+      backgroundColor: _backgroundColor,
       body: SafeArea(
-        child: Column(
+        child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black12,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.search
-                          ),
-                          const Padding(padding: EdgeInsets.only(left: 8.0)),
-                          Expanded(
-                            child: TextField(
-                              controller: _searchTermInputController,
-                              decoration: const InputDecoration.collapsed(
-                                hintText: 'Arama terimi girin.',
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Padding(padding: EdgeInsets.only(top: 30.0)),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: SizedBox(
+                          height: 60,
+                          width: MediaQuery.of(context).size.width,
+                          child: Container(
+                              decoration: BoxDecoration(
+                                color: _tertiaryColor,
+                                borderRadius: BorderRadius.circular(30.0),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: _shadowColor,
+                                    blurRadius: 10.0,
+                                    offset: Offset(0.0, 10.0),
+                                  )
+                                ],
                               ),
-                              textInputAction: TextInputAction.search,
-                              onSubmitted: (searchTerm) {
-                                setState(() {
-                                  _isLoading = true;
-                                });
-                                search(searchTerm);
-                              },
-                            ),
-                          ),
-                          const Padding(padding: EdgeInsets.only(left: 8.0)),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                child: Visibility(
-                                  visible: _isLoading,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: const [
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.search,
+                                      size: 32,
+                                      color: _primaryColor,
+                                    ),
+                                    const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                    Expanded(
+                                      child: TextField(
+                                        style: const TextStyle(
+                                          fontSize: 16.0,
+                                        ),
+                                        controller: _searchTermInputController,
+                                        decoration: const InputDecoration.collapsed(
+                                          hintText: 'Arama terimi girin.',
+                                        ),
+                                        textInputAction: TextInputAction.search,
+                                        onSubmitted: (searchTerm) {
+                                          setState(() {
+                                            _isLoading = true;
+                                          });
+                                          search(searchTerm);
+                                        },
+                                      ),
+                                    ),
+                                    const Padding(padding: EdgeInsets.only(left: 10.0)),
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
                                         Center(
-                                          child: SizedBox(
-                                            height: 14,
-                                            width: 14,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2.0,
+                                          child: Visibility(
+                                            visible: _isLoading,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: const [
+                                                  Center(
+                                                    child: SizedBox(
+                                                      height: 16,
+                                                      width: 16,
+                                                      child: CircularProgressIndicator(
+                                                        strokeWidth: 2.0,
+                                                        color: _primaryColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  height: 34, // adjust the height as needed
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(left: 8.0, right: 16.0),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _tableToListOfTables.length,
-                    itemBuilder: (context, index) {
-                      final key = _tableToListOfTables.keys.elementAt(index);
-                      final value = _tables[key];
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 8.0,),
-                        child: OutlinedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedTable = key;
-                            });
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                              width: 1.0,
-                              color: Colors.blue,
-                            ),
-                            backgroundColor: _selectedTable == key ? _selectedBoxColor : _unselectedBoxColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            value ?? 'Bulunamadı',
-                            style: TextStyle(
-                              color: _selectedTable == key ? _selectedTextColor : _unselectedTextColor,
-                            ),
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: 32,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(left: 10.0, right: 16.0),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _tableToListOfTables.length,
+                        itemBuilder: (context, index) {
+                          final key = _tableToListOfTables.keys.elementAt(index);
+                          final value = _tables[key];
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 10.0,),
+                            child: OutlinedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedTable = key;
+                                });
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  width: 1.0,
+                                  color: _selectedBoxColor,
+                                ),
+                                backgroundColor: _selectedTable == key ? _selectedBoxColor : _unselectedBoxColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                value ?? 'Bulunamadı',
+                                style: TextStyle(
+                                  color: _selectedTable == key ? _selectedTextColor : _unselectedTextColor,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20.0, right: 10.0, left: 10.0, bottom: 10.0),
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: _queryResults.length,
+                      itemBuilder: (context, index) {
+                        final queryResult = _queryResults.elementAt(index);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30.0),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: _shadowColor,
+                                  blurRadius: 10.0,
+                                  offset: Offset(0.0, 10.0),
+                                )
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _tertiaryColor,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.push<String>(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: queryResult['ndefUID'],)),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 15.0, bottom: 15.0, left: 10.0, right: 10.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Text(
+                                      '${queryResult['victim_name']} ${queryResult['victim_surname']}',
+                                      style: const TextStyle(
+                                        color: _primaryColor,
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Etiket ID: ${queryResult['ndefUID']}',
+                                      style: const TextStyle(
+                                        color: _primaryColor,
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    ),
+                                    const Padding(padding: EdgeInsets.only(bottom: 10.0)),
+                                    Text(
+                                      '${queryResult['city'] ?? 'İlçe Bilgisi Yok'}, ${queryResult['province'] ?? 'İl Bilgisi Yok'}',
+                                      style: const TextStyle(
+                                        color: _primaryColor,
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${queryResult['hospital_name']  ?? 'Hastane bilgisi girilmemiş'}',
+                                      style: const TextStyle(
+                                        color: _primaryColor,
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${queryResult['cemetery_name'] ?? 'Mezarlık bilgisi girilmemiş'}',
+                                      style: const TextStyle(
+                                        color: _primaryColor,
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: _queryResults.length,
-                  itemBuilder: (context, index) {
-                    final queryResult = _queryResults.elementAt(index);
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
+            SizedBox(
+              height: 60,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: _backgroundColor,
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 32,
+                          width: MediaQuery.of(context).size.width,
+                          child: Image.asset('assets/images/dost_large.png'),
                         ),
-                        onPressed: () {
-                          Navigator.push<String>(
-                            context,
-                            MaterialPageRoute(builder: (context) => SurvivorReadPage(ndefUID: queryResult['ndefUID'],)),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Text(
-                                '${queryResult['victim_name']} ${queryResult['victim_surname']}',
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const Padding(padding: EdgeInsets.only(bottom: 4.0)),
-                              Text(
-                                '${queryResult['city'] ?? 'İlçe Bilgisi Yok'}, ${queryResult['province'] ?? 'İl Bilgisi Yok'}',
-                                style: const TextStyle(
-                                    color: Colors.black54,
-                                ),
-                              ),
-                              Text(
-                                'Hastane: ${queryResult['hospital_name']  ?? 'Girilmemiş'}',
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                ),
-                              ),
-                              Text(
-                                'Mezarlık: ${queryResult['cemetery_name'] ?? 'Girilmemiş'}',
-                                style: const TextStyle(
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            ],
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () {Navigator.pop(context);},
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: _primaryColor,
+                            size: 32,
                           ),
                         ),
-                      )
-                    );
-                  },
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),

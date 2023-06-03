@@ -1,6 +1,14 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+const Color _primaryColor = Color(0xff6a6b83);
+const Color _secondaryColor = Color(0xff77789a);
+const Color _tertiaryColor = Color(0xffebebeb);
+const Color _backgroundColor = Color(0xffd5d5e4);
+const Color _shadowColor = Color(0x806a6b83);
 
 class SurvivorWritePage extends StatefulWidget {
   final String ndefUID;
@@ -17,6 +25,7 @@ class SurvivorWritePage extends StatefulWidget {
 }
 
 class _SurvivorWritePageState extends State<SurvivorWritePage> {
+
   String natID = 'Girilmemiş';
   String name = 'Girilmemiş';
   String surname = 'Girilmemiş';
@@ -35,16 +44,14 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
   final TextEditingController _ageMinInputController = TextEditingController();
   final TextEditingController _ageMaxInputController = TextEditingController();
   final TextEditingController _chronicIllnessInputController = TextEditingController();
-  final TextEditingController _essetialNeedsInputController = TextEditingController();
+  final TextEditingController _essentialNeedsInputController = TextEditingController();
 
   late FirebaseFirestore db;
 
-  final Color _primaryColor = const Color(0xff6a6b83);
-
-  final List<String> _bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-'];
+  final List<String> _bloodTypes = ['A Rh+', 'A Rh-', 'B Rh+', 'B Rh-', 'AB Rh+', 'AB Rh-', '0 Rh+', '0 Rh-'];
   final List<String> _sex = ['Kadın', 'Erkek'];
 
-  String _selectedBloodType = 'A+';
+  String _selectedBloodType = 'A Rh+';
   String _selectedSex = 'Kadın';
 
   @override
@@ -61,272 +68,221 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CupertinoNavigationBar(
-        middle: Text(
-          "Depremzede Bilgi Kayıt",
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, bottom: 30.0),
-                child: Text(
-                  "ndefUID: ${widget.ndefUID}",
-                  style: TextStyle(
-                    fontSize: 15.0,
-                    color: _primaryColor,
-                    fontWeight: FontWeight.w700,
+      backgroundColor: _backgroundColor,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        const Padding(padding: EdgeInsets.only(top: 50)),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20.0),
+                          child: SizedBox(
+                            height: 60,
+                            width: MediaQuery.of(context).size.width,
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: _tertiaryColor,
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: _shadowColor,
+                                      blurRadius: 10.0,
+                                      offset: Offset(0.0, 10.0),
+                                    )
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Etiket ID: ${widget.ndefUID}",
+                                      style: const TextStyle(
+                                        fontSize: 14.0,
+                                        color: _primaryColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                            ),
+                          ),
+                        ),
+                        TextInputFieldWidget(
+                          title: 'TC Kimlik No',
+                          labelText: natID,
+                          controller: _natIDInputController,
+                          maxLength: 11,
+                          keyboardType: TextInputType.number,
+                        ),
+                        TextInputFieldWidget(
+                          title: 'İsim',
+                          labelText: name,
+                          controller: _nameInputController,
+                        ),
+                        TextInputFieldWidget(
+                          title: 'Soyisim',
+                          labelText: surname,
+                          controller: _surnameInputController,
+                        ),
+                        DropdownFieldWidget(
+                          title: 'Cinsiyet',
+                          selectedItem: _selectedSex,
+                          items: _sex,
+                        ),
+                        TextInputFieldWidget(
+                          title: 'Minimum Yaş',
+                          labelText: ageMin,
+                          controller: _ageMinInputController,
+                          maxLength: 3,
+                          keyboardType: TextInputType.number,
+                        ),
+                        TextInputFieldWidget(
+                          title: 'Maksimum Yaş',
+                          labelText: ageMax,
+                          controller: _ageMaxInputController,
+                          maxLength: 3,
+                          keyboardType: TextInputType.number,
+                        ),
+                        DropdownFieldWidget(
+                          title: 'Kan Grubu',
+                          selectedItem: _selectedBloodType,
+                          items: _bloodTypes,
+                        ),
+                        TextInputFieldWidget(
+                          title: 'Kronik Rahatsızlıklar',
+                          labelText: chronicIllness,
+                          controller: _chronicIllnessInputController,
+                        ),
+                        TextInputFieldWidget(
+                          title: 'Temel İhtiyaçlar',
+                          labelText: essentialNeeds,
+                          controller: _essentialNeedsInputController,
+                        ),
+                        const Padding(padding: EdgeInsets.only(top: 100.0)),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'TC Kimlik No',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _natIDInputController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 11,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        labelText: natID
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'İsim',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _nameInputController,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: name
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Soyisim',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _surnameInputController,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: surname
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Cinsiyet'
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0, bottom: 20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        height: 60,
+                        child: Container(
+                            decoration: BoxDecoration(
+                              color: _tertiaryColor,
+                              borderRadius: BorderRadius.circular(30.0),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: _shadowColor,
+                                  blurRadius: 10.0,
+                                  offset: Offset(0.0, 10.0),
+                                )
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    child: SizedBox(
+                                      height: 60,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: _primaryColor,
+                                          borderRadius: BorderRadius.circular(30.0),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: _shadowColor,
+                                              blurRadius: 10.0,
+                                              offset: Offset(0.0, 10.0),
+                                            )
+                                          ],
+                                        ),
+                                        child: TextButton(
+                                          onPressed: () async {
+                                            writeVictimToDB();
+                                            Navigator.pop(context);
+                                          },
+                                          child: Stack(
+                                            children: const [
+                                              Center(
+                                                child: Text(
+                                                  'Güncelle',
+                                                  style: TextStyle(
+                                                      color: _tertiaryColor,
+                                                      fontSize: 16.0,
+                                                      fontWeight: FontWeight.w700
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                )
+                              ],
+                            )
                         ),
-                        DropdownButton(
-                          value: _selectedSex,
-                          items: _sex
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            // This is called when the user selects an item.
-                            setState(() {
-                              _selectedSex = value!;
-                            });
-                          },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 60,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: _backgroundColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _shadowColor,
+                      blurRadius: 10.0,
+                      offset: Offset(0.0, 10.0),
+                    )
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 32,
+                          width: MediaQuery.of(context).size.width,
+                          child: Image.asset('assets/images/dost_large.png'),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () {Navigator.pop(context);},
+                          icon: const Icon(
+                            Icons.arrow_back,
+                            color: _primaryColor,
+                            size: 32,
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Minimum Yaş',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _ageMinInputController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 3,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: ageMin
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Maksimum Yaş',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _ageMaxInputController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 3,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: ageMax
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                            'Kan Grubu'
-                        ),
-                        DropdownButton(
-                          value: _selectedBloodType,
-                          items: _bloodTypes
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            // This is called when the user selects an item.
-                            setState(() {
-                              _selectedBloodType = value!;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Kronik Rahatsızlıklar',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _chronicIllnessInputController,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: chronicIllness
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Temel İhtiyaçlar',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _essetialNeedsInputController,
-                      decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: essentialNeeds
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  writeVictimToDB();
-                  Navigator.pop(context);
-                },
-                child: const Text('Güncelle')),
-            ],
-          ),
+            )
+          ],
         ),
       )
     );
@@ -393,8 +349,8 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
       if (_chronicIllnessInputController.text.isNotEmpty) {
         victimData['chronic_illness'] = _chronicIllnessInputController.text;
       }
-      if (_essetialNeedsInputController.text.isNotEmpty) {
-        victimData['essential_needs'] = _essetialNeedsInputController.text;
+      if (_essentialNeedsInputController.text.isNotEmpty) {
+        victimData['essential_needs'] = _essentialNeedsInputController.text;
       }
 
       final docSnap = await docRef.get();
@@ -417,5 +373,172 @@ class _SurvivorWritePageState extends State<SurvivorWritePage> {
     } catch (e) {
       throw Exception('Failed to update victim data');
     }
+  }
+}
+
+class TextInputFieldWidget extends StatelessWidget {
+
+  final String title;
+  final String labelText;
+  final TextEditingController controller;
+  final TextInputType? keyboardType;
+  final int? maxLength;
+
+  const TextInputFieldWidget({
+    Key? key,
+    required this.title,
+    required this.labelText,
+    required this.controller,
+    this.keyboardType,
+    this.maxLength,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: SizedBox(
+        height: maxLength != null ? 120 : 90,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _tertiaryColor,
+            borderRadius: BorderRadius.circular(30.0),
+            boxShadow: const [
+              BoxShadow(
+                color: _shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0.0, 10.0),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: _primaryColor,
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(top: 10.0)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: maxLength != null ? 40 : 20,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            labelText: labelText,
+                            floatingLabelStyle: const TextStyle(
+                              color: Colors.transparent
+                            )
+                          ),
+                          cursorColor: _primaryColor,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: _primaryColor,
+                          ),
+                          controller: controller,
+                          keyboardType: keyboardType,
+                          maxLength: maxLength,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DropdownFieldWidget extends StatefulWidget {
+
+  final String title;
+  String selectedItem;
+  final List<String> items;
+
+  DropdownFieldWidget({
+    Key? key,
+    required this.title,
+    required this.selectedItem,
+    required this.items,
+  }) : super(key: key);
+
+  @override
+  _DropdownFieldWidgetState createState() => _DropdownFieldWidgetState();
+}
+
+class _DropdownFieldWidgetState extends State<DropdownFieldWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: SizedBox(
+        height: 60,
+        child: Container(
+          decoration: BoxDecoration(
+            color: _tertiaryColor,
+            borderRadius: BorderRadius.circular(30.0),
+            boxShadow: const [
+              BoxShadow(
+                color: _shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0.0, 10.0),
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: _primaryColor,
+                      ),
+                    ),
+                    DropdownButtonHideUnderline(
+                      child: DropdownButton(
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: _primaryColor,
+                        ),
+                        value: widget.selectedItem,
+                        items: widget.items
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (String? value) {
+                          // This is called when the user selects an item.
+                          setState(() {
+                            widget.selectedItem = value!;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
